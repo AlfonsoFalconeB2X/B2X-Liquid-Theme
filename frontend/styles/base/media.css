@@ -1,0 +1,28 @@
+/* ---------- Media ---------- */
+.media {
+  position: relative;
+  display: block;
+  aspect-ratio: var(--ratio, auto);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-tint);
+}
+
+.media > img,
+.media > video,
+.media > iframe,
+.media > svg,
+.media > picture,
+.media > picture > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+}
+
+.placeholder-svg {
+  background: var(--color-tint);
+  fill: color-mix(in srgb, var(--color-fg) 22%, transparent);
+}

@@ -1,0 +1,160 @@
+/* ---------- Pannelli laterali (popover e dialog) ---------- */
+.drawer {
+  position: fixed;
+  inset: 0.5rem auto 0.5rem 0.5rem;
+  width: min(26rem, calc(100% - 1rem));
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  border: 0;
+  border-radius: var(--panel-radius);
+  background: var(--gradient-bg);
+  color: var(--color-fg);
+  overflow: hidden;
+  translate: calc(-100% - 1rem) 0;
+  transition:
+    translate 0.32s var(--ease),
+    overlay 0.32s allow-discrete,
+    display 0.32s allow-discrete;
+}
+
+.drawer--right {
+  inset: 0.5rem 0.5rem 0.5rem auto;
+  translate: calc(100% + 1rem) 0;
+}
+
+.drawer:popover-open,
+.drawer[open] {
+  display: flex;
+  translate: 0 0;
+}
+
+@starting-style {
+  .drawer:popover-open,
+  .drawer[open] {
+    translate: calc(-100% - 1rem) 0;
+  }
+
+  .drawer--right:popover-open,
+  .drawer--right[open] {
+    translate: calc(100% + 1rem) 0;
+  }
+}
+
+.drawer::backdrop,
+.search-modal::backdrop {
+  background: rgb(12 18 15 / 0.42);
+  opacity: 0;
+  transition:
+    opacity 0.32s var(--ease),
+    overlay 0.32s allow-discrete,
+    display 0.32s allow-discrete;
+}
+
+.drawer:popover-open::backdrop,
+.drawer[open]::backdrop,
+.search-modal:popover-open::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .drawer:popover-open::backdrop,
+  .drawer[open]::backdrop,
+  .search-modal:popover-open::backdrop {
+    opacity: 0;
+  }
+}
+
+html:has(.drawer:popover-open),
+html:has(.drawer[open]),
+html:has(.search-modal:popover-open) {
+  overflow: hidden;
+}
+
+.drawer__header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.drawer__title {
+  font-family: var(--font-heading-family);
+  font-weight: var(--font-heading-weight);
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.drawer__body {
+  flex: 1;
+  padding: 0.5rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.drawer__footer {
+  flex: none;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.mobile-nav__item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mobile-nav__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1rem;
+  font-size: 1.125rem;
+  text-decoration: none;
+}
+
+.mobile-nav__link[aria-current='page'] {
+  font-weight: var(--font-body-weight-bold);
+}
+
+.mobile-nav__details[open] > summary .icon {
+  rotate: 180deg;
+}
+
+.mobile-nav__details > summary .icon {
+  transition: rotate var(--duration) var(--ease);
+}
+
+.mobile-nav__sub {
+  display: grid;
+  gap: 0.125rem;
+  padding: 0 0 1rem;
+}
+
+.mobile-nav__sub--nested {
+  padding: 0.125rem 0 0.5rem 1rem;
+}
+
+.mobile-nav__sublink {
+  display: block;
+  padding: 0.5rem 0;
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.mobile-nav__sublink:hover,
+.mobile-nav__sublink[aria-current='page'] {
+  color: var(--color-fg);
+}
+
+.mobile-nav__sublink--all {
+  color: var(--color-fg);
+  font-weight: var(--font-body-weight-bold);
+}

@@ -11,3 +11,13 @@ shopify.theme.toml
 .gitignore
 .editorconfig
 .theme-check.yml
+
+# Sorgenti e strumenti di build: sul tema vanno solo i file compilati in assets/
+node_modules/*
+frontend/*
+tools/*
+package.json
+package-lock.json
+vite.config.js
+assets/.vite/*
+.gitattributes

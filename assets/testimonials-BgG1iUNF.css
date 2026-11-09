@@ -1,0 +1,41 @@
+/* Section Testimonianze (caricato da sections/testimonials.liquid) */
+
+.quote-card {
+  display: grid;
+  align-content: space-between;
+  gap: 1.5rem;
+  height: 100%;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.quote-card__rating {
+  display: flex;
+  gap: 0.125rem;
+  color: var(--color-button);
+}
+
+.quote-card__text {
+  font-family: var(--font-heading-family);
+  font-size: 1.1875rem;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+.quote-card__author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.quote-card__avatar {
+  flex: none;
+  width: 2.75rem;
+  border-radius: 50%;
+}
+
+.quote-card__name {
+  font-weight: var(--font-body-weight-bold);
+}

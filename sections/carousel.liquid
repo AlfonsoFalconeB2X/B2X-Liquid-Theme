@@ -1,4 +1,5 @@
-<script src="{{ 'carousel.js' | asset_url }}" type="module"></script>
+{% render 'vite-tag', entry: 'carousel.css' %}
+{% render 'vite-tag', entry: 'carousel.js' %}
 {%- liquid
   assign s = section.settings
   assign track_label = s.heading | escape

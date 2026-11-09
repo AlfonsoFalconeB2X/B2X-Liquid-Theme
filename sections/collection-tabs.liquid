@@ -1,4 +1,5 @@
-<script src="{{ 'collection-tabs.js' | asset_url }}" type="module"></script>
+{% render 'vite-tag', entry: 'collection-tabs.css' %}
+{% render 'vite-tag', entry: 'collection-tabs.js' %}
 {%- liquid
   assign s = section.settings
   assign columns = s.columns_desktop

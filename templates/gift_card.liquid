@@ -15,7 +15,8 @@
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 96, height: 96 }}">
     {%- endif -%}
     {% render 'theme-styles' %}
-    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {% render 'vite-tag', entry: 'base.css' %}
+    {% render 'vite-tag', entry: 'gift-card.css' %}
     <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
     {{ content_for_header }}
   </head>

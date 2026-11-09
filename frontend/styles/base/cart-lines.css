@@ -1,0 +1,152 @@
+/* ---------- Carrello (cassetto e pagina) ---------- */
+.cart-lines {
+  display: grid;
+}
+
+.cart-line {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.5rem 1rem;
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  transition: opacity var(--duration) var(--ease);
+}
+
+.cart-line[aria-busy='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.cart-line__info {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.cart-line__title {
+  font-weight: var(--font-body-weight-bold);
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.cart-line__title:hover {
+  text-decoration: underline;
+}
+
+.cart-line__meta,
+.cart-line__discount {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+
+.cart-line__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.cart-line__remove {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--color-muted);
+}
+
+.cart-line__remove:hover {
+  color: var(--color-fg);
+}
+
+.cart-line__price {
+  display: grid;
+  justify-items: end;
+  font-size: 0.9375rem;
+  font-weight: var(--font-body-weight-bold);
+  text-align: right;
+}
+
+.cart-line__price .price__compare {
+  font-weight: var(--font-body-weight);
+}
+
+.cart-totals {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cart-totals__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9375rem;
+}
+
+.cart-totals__row--discount {
+  color: var(--color-success);
+}
+
+.cart-totals__row--total {
+  font-size: 1.125rem;
+  font-weight: var(--font-body-weight-bold);
+}
+
+.cart-totals__note {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding-block: clamp(2rem, 8vw, 4rem);
+  text-align: center;
+}
+
+.empty-state__icon {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: var(--color-tint);
+}
+
+.empty-state__icon .icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.cart-drawer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.cart-drawer__body {
+  padding-top: 0;
+}
+
+.cart-drawer__checkout {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.cart-drawer__view {
+  justify-self: center;
+  font-size: 0.875rem;
+}
+
+.cart-drawer__empty {
+  flex: 1;
+  display: grid;
+  align-content: center;
+  padding: 2rem 1.5rem;
+}
+
+shopify-accelerated-checkout,
+shopify-accelerated-checkout-cart {
+  --shopify-accelerated-checkout-button-border-radius: var(--radius-button);
+  --shopify-accelerated-checkout-button-block-size: 3rem;
+  --shopify-accelerated-checkout-inline-alignment: center;
+}

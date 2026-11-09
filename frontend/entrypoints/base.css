@@ -1,0 +1,31 @@
+/*
+ * base.css — stili globali del tema: tutto ciò che serve in ogni pagina o è condiviso da più section.
+ * Vite unisce i parziali in un solo file; l'ordine degli @import è l'ordine della cascata.
+ * Gli stili di una sola section o pagina stanno in un entrypoint dedicato, caricato da quella section.
+ * Colori: solo le variabili degli schemi (--color-bg, --color-fg, --color-surface, --color-border,
+ * --color-button, --color-button-fg, --color-secondary-fg e derivati), definite in snippets/theme-styles.liquid.
+ * Breakpoint: 750px (tablet) e 990px (desktop), sempre mobile-first.
+ */
+
+@import '../styles/base/reset.css';
+@import '../styles/base/variables.css';
+@import '../styles/base/typography.css';
+@import '../styles/base/layout.css';
+@import '../styles/base/buttons.css';
+@import '../styles/base/forms.css';
+@import '../styles/base/media.css';
+@import '../styles/base/cards.css';
+@import '../styles/base/header.css';
+@import '../styles/base/drawers.css';
+@import '../styles/base/search.css';
+@import '../styles/base/announcement-bar.css';
+@import '../styles/base/footer.css';
+@import '../styles/base/cart-lines.css';
+@import '../styles/base/sections.css';
+@import '../styles/base/pages.css';
+@import '../styles/base/toast.css';
+@import '../styles/base/quick-view.css';
+@import '../styles/base/card-swatches.css';
+@import '../styles/base/cart-extras.css';
+@import '../styles/base/pagination.css';
+@import '../styles/base/motion.css';

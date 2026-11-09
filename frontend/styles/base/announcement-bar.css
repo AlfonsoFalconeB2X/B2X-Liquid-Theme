@@ -1,0 +1,53 @@
+/* ---------- Barra annunci ---------- */
+.announcement {
+  font-size: 0.8125rem;
+  font-weight: var(--font-body-weight-bold);
+  line-height: 1.4;
+}
+
+.announcement__inner {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.5rem;
+}
+
+.announcement__track {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.announcement__track::-webkit-scrollbar {
+  display: none;
+}
+
+.announcement__item {
+  flex: 0 0 100%;
+  padding-block: 0.5rem;
+  text-align: center;
+  scroll-snap-align: center;
+}
+
+.announcement__item a {
+  text-underline-offset: 0.25em;
+}
+
+.announcement__button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-button);
+  background: none;
+  color: inherit;
+}
+
+.announcement__button:hover {
+  background: color-mix(in srgb, var(--color-fg) 10%, transparent);
+}

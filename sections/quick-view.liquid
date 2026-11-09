@@ -1,7 +1,7 @@
 {%- comment -%}
-  Contenuto dell'anteprima rapida, richiesto da assets/quick-view.js con
+  Contenuto dell'anteprima rapida, richiesto da frontend/scripts/quick-view.js con
   /products/<handle>?section_id=quick-view (Section Rendering API). Non va aggiunta alle pagine.
-  Usa gli stessi snippet e lo stesso JS (assets/product.js) della pagina prodotto.
+  Usa gli stessi snippet e lo stesso JS (frontend/entrypoints/product.js) della pagina prodotto.
 {%- endcomment -%}
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant

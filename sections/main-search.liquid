@@ -1,5 +1,5 @@
-{{ 'collection.css' | asset_url | stylesheet_tag }}
-<script src="{{ 'collection.js' | asset_url }}" type="module"></script>
+{% render 'vite-tag', entry: 'collection.css' %}
+{% render 'vite-tag', entry: 'collection.js' %}
 
 {%- liquid
   assign s = section.settings

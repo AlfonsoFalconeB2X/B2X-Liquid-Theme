@@ -1,0 +1,87 @@
+/* ---------- Anteprima rapida (contenitore) ---------- */
+.quick-view {
+  position: fixed;
+  inset: auto 0 0;
+  width: 100%;
+  max-width: none;
+  max-height: 92svh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--panel-radius) var(--panel-radius) 0 0;
+  background: var(--gradient-bg);
+  color: var(--color-fg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  translate: 0 100%;
+  transition:
+    translate 0.32s var(--ease),
+    overlay 0.32s allow-discrete,
+    display 0.32s allow-discrete;
+}
+
+.quick-view[open] {
+  translate: 0 0;
+}
+
+@starting-style {
+  .quick-view[open] {
+    translate: 0 100%;
+  }
+}
+
+.quick-view::backdrop {
+  background: rgb(12 18 15 / 0.42);
+}
+
+@media (min-width: 750px) {
+  .quick-view {
+    inset: 0;
+    width: min(60rem, calc(100% - 3rem));
+    max-height: min(44rem, calc(100svh - 3rem));
+    margin: auto;
+    border-radius: var(--panel-radius);
+    translate: none;
+    opacity: 0;
+    scale: 0.97;
+    transition:
+      opacity 0.25s var(--ease),
+      scale 0.25s var(--ease),
+      overlay 0.25s allow-discrete,
+      display 0.25s allow-discrete;
+  }
+
+  .quick-view[open] {
+    opacity: 1;
+    scale: 1;
+    translate: none;
+  }
+
+  @starting-style {
+    .quick-view[open] {
+      opacity: 0;
+      scale: 0.97;
+      translate: none;
+    }
+  }
+}
+
+.quick-view__close {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 2;
+  float: right;
+  margin: 0.75rem 0.75rem -3.5rem 0;
+  background: var(--color-surface);
+}
+
+.quick-view__loading {
+  display: grid;
+  place-items: center;
+  min-height: 20rem;
+}
+
+html:has(.quick-view[open]),
+html:has(.lightbox[open]) {
+  overflow: hidden;
+}

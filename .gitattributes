@@ -1,0 +1,4 @@
+# Output della build: salvato così com'è (niente conversione dei fine riga né merge testuale: i conflitti
+# si risolvono rifacendo la build) e mostrato come file generato nelle diff e nelle pull request.
+assets/** binary linguist-generated=true
+snippets/vite-tag.liquid eol=lf linguist-generated=true

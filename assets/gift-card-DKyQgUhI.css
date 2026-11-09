@@ -1,0 +1,35 @@
+/* Buono regalo (caricato da templates/gift_card.liquid) */
+
+.gift-card__content {
+  gap: 1.5rem;
+}
+
+.gift-card__value,
+.gift-card__code {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+}
+
+.gift-card__code-value {
+  padding: 0.75rem 1.25rem;
+  border: 1.5px dashed var(--color-input-border);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.125rem;
+  letter-spacing: 0.08em;
+}
+
+.gift-card__qr img,
+.gift-card__qr canvas {
+  padding: 0.5rem;
+  border-radius: var(--radius-input);
+  background: #fff;
+}
+
+@media print {
+  .gift-card .button-group {
+    display: none;
+  }
+}

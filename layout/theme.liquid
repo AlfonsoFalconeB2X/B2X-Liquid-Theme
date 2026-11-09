@@ -30,7 +30,7 @@
     </script>
 
     {% render 'theme-styles' %}
-    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {% render 'vite-tag', entry: 'base.css' %}
 
     <script>
       window.theme = {
@@ -41,11 +41,6 @@
           cartChange: {{ routes.cart_change_url | json }},
           cartUpdate: {{ routes.cart_update_url | json }},
           predictiveSearch: {{ routes.predictive_search_url | json }}
-        },
-        assets: {
-          productJs: {{ 'product.js' | asset_url | json }},
-          productCss: {{ 'product.css' | asset_url | json }},
-          quickView: {{ 'quick-view.js' | asset_url | json }}
         },
         cartType: {{ settings.cart_type | json }},
         drawerScheme: {{ settings.drawer_color_scheme | json }},
@@ -60,7 +55,7 @@
         }
       };
     </script>
-    <script src="{{ 'theme.js' | asset_url }}" type="module"></script>
+    {% render 'vite-tag', entry: 'theme.js' %}
 
     {{ content_for_header }}
   </head>

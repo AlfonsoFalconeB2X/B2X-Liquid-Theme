@@ -1,0 +1,18 @@
+/* Section Testo (caricato da sections/rich-text.liquid) */
+
+.rich-text {
+  display: grid;
+  justify-items: start;
+  gap: 1.25rem;
+  max-width: 48rem;
+}
+
+.rich-text--center {
+  justify-items: center;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.rich-text--center .button-group {
+  justify-content: center;
+}

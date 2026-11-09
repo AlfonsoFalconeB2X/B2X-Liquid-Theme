@@ -1,0 +1,174 @@
+/* ---------- Card prodotto ---------- */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  height: 100%;
+}
+
+.card--surface {
+  padding: 0.5rem 0.5rem 1rem;
+  border-radius: calc(var(--radius-card) + 0.5rem);
+  background: var(--color-surface);
+}
+
+.card--surface .card__body,
+.card--surface .card__footer {
+  padding-inline: 0.5rem;
+}
+
+.card__media {
+  position: relative;
+}
+
+.card__image {
+  transition:
+    opacity 0.35s var(--ease),
+    transform 0.6s var(--ease);
+}
+
+.card__image--secondary {
+  opacity: 0;
+}
+
+@media (hover: hover) {
+  .card--has-secondary:hover .card__image--secondary {
+    opacity: 1;
+  }
+
+  .card:not(.card--has-secondary):hover .card__image,
+  .collection-card:hover .media img,
+  .article-card:hover .media img {
+    transform: scale(1.03);
+  }
+}
+
+.collection-card .media img,
+.article-card .media img {
+  transition: transform 0.6s var(--ease);
+}
+
+.card__badges {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.card__body {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.card__vendor {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+
+.card__title {
+  font-family: var(--font-body-family);
+  font-size: 1rem;
+  font-weight: var(--font-body-weight-bold);
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.card__link {
+  text-decoration: none;
+}
+
+/* L'intera card è cliccabile tramite il link del titolo */
+.card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--radius-card);
+}
+
+.card__link:focus-visible {
+  outline: none;
+}
+
+.card__link:focus-visible::after {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 3px;
+}
+
+.card__footer {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+}
+
+.price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.price--on-sale .price__current {
+  font-weight: var(--font-body-weight-bold);
+}
+
+.price__compare {
+  color: var(--color-muted);
+  font-size: 0.875em;
+}
+
+.price__unit {
+  width: 100%;
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+
+.price--large {
+  font-size: 1.375rem;
+}
+
+/* ---------- Card collezione e articolo ---------- */
+.collection-card,
+.article-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.875rem;
+}
+
+.collection-card__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-body-family);
+  font-size: 1rem;
+  font-weight: var(--font-body-weight-bold);
+  letter-spacing: 0;
+}
+
+.collection-card__count,
+.article-card__meta {
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+
+.article-card__body {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.article-card__title {
+  font-size: 1.1875rem;
+  line-height: 1.3;
+}
+
+.article-card__excerpt {
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+}

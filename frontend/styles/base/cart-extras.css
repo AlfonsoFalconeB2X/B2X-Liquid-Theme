@@ -1,0 +1,75 @@
+/* ---------- Carrello: sconti, spedizione gratuita, nota ---------- */
+.cart-discount {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.inline-form--small .input {
+  min-height: 2.5rem;
+  padding-block: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.cart-discount .form-message {
+  margin-top: 0;
+}
+
+.chip-link--muted {
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
+
+button.chip-link {
+  border: 0;
+  cursor: pointer;
+}
+
+.free-shipping {
+  display: grid;
+  gap: 0.625rem;
+  margin-block: 1rem 0.25rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-input);
+  background: var(--color-tint);
+  font-size: 0.875rem;
+}
+
+.free-shipping__text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.free-shipping__bar {
+  height: 0.375rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+}
+
+.free-shipping__fill {
+  display: block;
+  width: var(--progress, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-button);
+  transition: width 0.6s var(--ease);
+}
+
+.free-shipping--reached .free-shipping__fill {
+  background: var(--color-success);
+}
+
+.cart-note {
+  display: grid;
+  gap: 1rem;
+  padding-block: 1.25rem 0.25rem;
+}
+
+.cart-note__status {
+  min-height: 1.25em;
+}
+
+.textarea--small {
+  min-height: 4.5rem;
+}

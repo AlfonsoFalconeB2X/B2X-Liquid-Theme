@@ -1,0 +1,56 @@
+/* Section Tab di collezioni (caricato da sections/collection-tabs.liquid) */
+
+.tabs__head {
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.tabs__head .section-heading {
+  margin-bottom: 1.25rem;
+}
+
+.tabs__list {
+  display: flex;
+  gap: 0.375rem;
+  margin-inline: calc(-1 * var(--gutter));
+  padding: 0.25rem var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs__tab {
+  flex: none;
+  min-height: 2.5rem;
+  padding: 0.5rem 1.125rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-tint);
+  color: inherit;
+  font-size: 0.9375rem;
+  font-weight: var(--font-body-weight-bold);
+  transition:
+    background-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+
+.tabs__tab:hover {
+  background: var(--color-tint-strong);
+}
+
+.tabs__tab[aria-selected='true'] {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+.js .tabs__panel:not([data-active]) {
+  display: none;
+}
+
+.no-js .tabs__panel + .tabs__panel {
+  margin-top: 3rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .tabs__panel[data-active] {
+    animation: fade-rise 0.35s var(--ease);
+  }
+}

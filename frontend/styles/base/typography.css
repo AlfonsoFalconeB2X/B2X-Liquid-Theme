@@ -1,0 +1,176 @@
+/* ---------- Tipografia ---------- */
+h1,
+h2,
+h3,
+h4,
+h5,
+.h0,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5 {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.h0 {
+  font-size: calc(var(--heading-scale) * clamp(2.5rem, 1.5rem + 3.8vw, 4.75rem));
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+h1,
+.h1 {
+  font-size: calc(var(--heading-scale) * clamp(2.125rem, 1.6rem + 2.2vw, 3.5rem));
+  line-height: 1.06;
+}
+
+h2,
+.h2 {
+  font-size: calc(var(--heading-scale) * clamp(1.75rem, 1.4rem + 1.4vw, 2.625rem));
+}
+
+h3,
+.h3 {
+  font-size: calc(var(--heading-scale) * clamp(1.3125rem, 1.2rem + 0.5vw, 1.625rem));
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+h4,
+.h4 {
+  font-size: calc(var(--heading-scale) * 1.1875rem);
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+h5,
+.h5 {
+  font-size: 1rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+strong,
+b {
+  font-weight: var(--font-body-weight-bold);
+}
+
+.text-muted {
+  color: var(--color-muted);
+}
+
+.text-small {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.text-lead {
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  line-height: 1.55;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  width: fit-content;
+  padding: 0.375em 0.875em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-fg) 8%, transparent);
+  font-size: 0.8125rem;
+  font-weight: var(--font-body-weight-bold);
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-button);
+  background: var(--color-fg);
+  color: var(--color-bg);
+  font-weight: var(--font-body-weight-bold);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* Contenuti richtext del merchant */
+.rte > * + * {
+  margin-top: 1em;
+}
+
+.rte h2,
+.rte h3,
+.rte h4 {
+  margin-top: 1.6em;
+}
+
+.rte > :first-child {
+  margin-top: 0;
+}
+
+.rte ul,
+.rte ol {
+  margin-block: 0;
+  padding-left: 1.25em;
+}
+
+.rte li + li {
+  margin-top: 0.35em;
+}
+
+.rte a {
+  text-decoration: underline;
+}
+
+.rte img {
+  height: auto;
+  border-radius: var(--radius-card);
+}
+
+.rte blockquote {
+  padding-left: 1.25rem;
+  border-left: 3px solid var(--color-border);
+  font-size: 1.125rem;
+}
+
+.rte table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rte th,
+.rte td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}

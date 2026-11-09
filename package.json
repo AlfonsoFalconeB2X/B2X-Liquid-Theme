@@ -1,0 +1,24 @@
+{
+  "name": "b2x-theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tema Shopify B2X",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "vite build",
+    "build:stage": "node tools/stage-build.mjs",
+    "watch": "node tools/dev.mjs --watch-only",
+    "dev": "node tools/dev.mjs",
+    "prelint": "node tools/ensure-build.mjs",
+    "lint": "shopify theme check",
+    "prepush": "npm run build",
+    "push": "shopify theme push --unpublished"
+  },
+  "devDependencies": {
+    "vite": "^8.3.7",
+    "vite-plugin-shopify": "^5.0.0"
+  }
+}

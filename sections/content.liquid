@@ -1,3 +1,4 @@
+{% render 'vite-tag', entry: 'content.css' %}
 {%- assign s = section.settings -%}
 <div {% render 'section-attributes', section: section %}>
   <div class="section__inner page-width{% if s.width == 'narrow' %} page-width--narrow{% endif %}">

@@ -1,0 +1,116 @@
+/* ---------- Movimento essenziale ---------- */
+
+/*
+ * Comparsa durante lo scorrimento: theme.js aggiunge .reveal-ready a <html> (solo con JS, impostazione attiva,
+ * movimento non ridotto e fuori dal theme editor) e .is-visible agli elementi che entrano nello schermo.
+ * Senza JS nulla viene nascosto. Mai sull'elemento LCP (prima section).
+ */
+.reveal-ready .reveal {
+  opacity: 0;
+  translate: 0 1.5rem;
+  transition:
+    opacity 0.6s var(--ease) calc(var(--reveal-index, 0) * 70ms),
+    translate 0.6s var(--ease) calc(var(--reveal-index, 0) * 70ms);
+}
+
+.reveal-ready .reveal.is-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Ingresso del testo della hero (l'immagine resta ferma: è l'elemento LCP) */
+  .hero__content > * {
+    animation: rise 0.6s var(--ease) both;
+  }
+
+  .hero__content > :nth-child(2) {
+    animation-delay: 70ms;
+  }
+
+  .hero__content > :nth-child(3) {
+    animation-delay: 140ms;
+  }
+
+  .hero__content > :nth-child(n + 4) {
+    animation-delay: 210ms;
+  }
+
+  /* Dissolvenza tra le pagine (attiva da Impostazioni tema → Animazioni, @view-transition in theme-styles) */
+  ::view-transition-old(root) {
+    animation: 160ms ease both fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation: 280ms var(--ease) both fade-rise;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 1rem;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
+
+/* Header: ombra dopo lo scorrimento, a scomparsa scendendo */
+.shopify-section:has(> .header-wrapper--sticky) {
+  transition: translate 0.3s var(--ease);
+}
+
+.shopify-section[data-header-hidden] {
+  translate: 0 -100%;
+}
+
+.header-wrapper--sticky {
+  transition: box-shadow 0.3s var(--ease);
+}
+
+.shopify-section[data-header-scrolled] > .header-wrapper--sticky {
+  box-shadow: 0 10px 30px -22px rgb(0 0 0 / 0.35);
+}
+
+/* Contatore del carrello che "pulsa" quando aumenta */
+.cart-count.is-bumped {
+  animation: bump 0.45s var(--ease);
+}
+
+@keyframes bump {
+  40% {
+    scale: 1.35;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

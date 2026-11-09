@@ -1,0 +1,115 @@
+/* ---------- Layout ---------- */
+.page-width {
+  width: 100%;
+  max-width: calc(var(--page-width) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.page-width--narrow {
+  max-width: calc(48rem + 2 * var(--gutter));
+}
+
+.page-width--reading {
+  max-width: calc(42rem + 2 * var(--gutter));
+}
+
+.section {
+  padding-block: calc(var(--pt, 64px) * var(--space-scale)) calc(var(--pb, 64px) * var(--space-scale));
+}
+
+/* Riquadro: lo schema colora un pannello arrotondato invece di tutta la larghezza */
+.section.section--boxed {
+  padding-block: calc(var(--gutter) / 2);
+  background: none;
+}
+
+.section--boxed > .section__inner {
+  position: relative;
+  isolation: isolate;
+  width: calc(100% - 2 * var(--gutter));
+  max-width: var(--page-width);
+  margin-inline: auto;
+  padding: calc(var(--pt, 64px) * var(--space-scale)) var(--panel-pad) calc(var(--pb, 64px) * var(--space-scale));
+  border-radius: var(--panel-radius);
+  background: var(--gradient-bg);
+  overflow: clip;
+  --slider-bleed: var(--panel-pad);
+}
+
+.section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.section-heading__text {
+  display: grid;
+  justify-items: start;
+  gap: 0.875rem;
+  max-width: 42rem;
+}
+
+.section-heading--center {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.section-heading--center .section-heading__text {
+  justify-items: center;
+}
+
+.section-footer-link {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols-mobile, 1), minmax(0, 1fr));
+  gap: var(--grid-gap, clamp(1rem, 2vw, 1.5rem));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 750px) {
+  .grid {
+    grid-template-columns: repeat(var(--cols-tablet, 2), minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 990px) {
+  .grid {
+    grid-template-columns: repeat(var(--cols-desktop, 4), minmax(0, 1fr));
+  }
+}
+
+/* Su mobile la griglia diventa una riga che scorre (solo CSS, scroll-snap) */
+@media (max-width: 749px) {
+  .grid--slider {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--slide-width, 78%);
+    margin-inline: calc(-1 * var(--slider-bleed, var(--gutter)));
+    padding-inline: var(--slider-bleed, var(--gutter));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--slider-bleed, var(--gutter));
+    scrollbar-width: none;
+  }
+
+  .grid--slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .grid--slider > * {
+    scroll-snap-align: start;
+  }
+}

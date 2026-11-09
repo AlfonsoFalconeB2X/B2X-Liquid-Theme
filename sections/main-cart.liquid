@@ -1,4 +1,4 @@
-{{ 'cart.css' | asset_url | stylesheet_tag }}
+{% render 'vite-tag', entry: 'cart.css' %}
 
 <div {% render 'section-attributes', section: section %}>
   <div class="section__inner page-width" data-cart-section="{{ section.id }}">

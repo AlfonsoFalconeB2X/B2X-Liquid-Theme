@@ -1,3 +1,11 @@
+# Dipendenze
+node_modules/
+
+# assets/ e snippets/vite-tag.liquid sono generati dalla build ma restano in git: l'integrazione GitHub
+# di Shopify carica sul tema i file del branch così come sono. Il manifest di Vite serve solo alla build
+# (e Shopify non accetta sottocartelle in assets/).
+assets/.vite/
+
 # Shopify CLI
 .shopify/
 .shopify-cli.json
@@ -11,3 +19,6 @@ Thumbs.db
 # Ambiente
 .env
 .env.local
+
+# Log
+npm-debug.log*
