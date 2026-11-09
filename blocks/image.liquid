@@ -1,0 +1,54 @@
+{%- liquid
+  case block.settings.ratio
+    when 'square'
+      assign ratio = 1
+    when 'portrait'
+      assign ratio = 0.8
+    when 'landscape'
+      assign ratio = 1.5
+    else
+      assign ratio = block.settings.image.aspect_ratio | default: 1.5
+  endcase
+  assign max_width = settings.page_width | times: block.settings.width | divided_by: 100
+  assign sizes = '(min-width: 990px) ' | append: max_width | append: 'px, 100vw'
+-%}
+<div class="block-image" style="--block-width: {{ block.settings.width }}%;" {{ block.shopify_attributes }}>
+  {%- capture media -%}
+    <span class="media" style="--ratio: {{ ratio }};">
+      {%- if block.settings.image != blank -%}
+        {{ block.settings.image | image_url: width: 2000 | image_tag: widths: '360, 540, 750, 1000, 1300, 1600, 2000', sizes: sizes, loading: 'lazy' }}
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </span>
+  {%- endcapture -%}
+  {%- if block.settings.link != blank -%}
+    <a href="{{ block.settings.link }}" class="block-image__link">{{ media }}</a>
+  {%- else -%}
+    {{ media }}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Immagine",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Immagine" },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Proporzioni",
+      "options": [
+        { "value": "natural", "label": "Originali" },
+        { "value": "landscape", "label": "Orizzontali" },
+        { "value": "square", "label": "Quadrate" },
+        { "value": "portrait", "label": "Verticali" }
+      ],
+      "default": "natural"
+    },
+    { "type": "range", "id": "width", "label": "Larghezza", "min": 20, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "url", "id": "link", "label": "Link" }
+  ],
+  "presets": [{ "name": "Immagine" }]
+}
+{% endschema %}

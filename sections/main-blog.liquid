@@ -1,0 +1,66 @@
+{%- liquid
+  assign s = section.settings
+  assign columns = s.columns_desktop
+  assign column_width = settings.page_width | divided_by: columns
+  assign sizes = '(min-width: 990px) ' | append: column_width | append: 'px, (min-width: 750px) 50vw, 100vw'
+-%}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    <div class="page-header">
+      <h1>{{ blog.title | escape }}</h1>
+      {%- if s.show_tags and blog.all_tags.size > 0 -%}
+        <nav aria-label="{{ 'blogs.filter_by_tag' | t }}">
+          <ul class="tag-list" role="list">
+            <li>
+              <a class="chip-link" href="{{ blog.url }}"{% unless current_tags %} aria-current="page"{% endunless %}>{{ 'blogs.all' | t }}</a>
+            </li>
+            {%- for tag in blog.all_tags -%}
+              <li>
+                <a class="chip-link" href="{{ blog.url }}/tagged/{{ tag | handle }}"{% if current_tags contains tag %} aria-current="page"{% endif %}>
+                  {{- tag | escape -}}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+    </div>
+
+    {%- paginate blog.articles by s.articles_per_page -%}
+      {%- if blog.articles.size > 0 -%}
+        <ul class="grid" role="list" style="--cols-mobile: 1; --cols-tablet: 2; --cols-desktop: {{ columns }}; --grid-gap: clamp(1.5rem, 3vw, 2.5rem);">
+          {%- for article in blog.articles -%}
+            <li class="reveal">
+              {% render 'article-card', article: article, sizes: sizes, show_excerpt: s.show_excerpt, show_date: s.show_date %}
+            </li>
+          {%- endfor -%}
+        </ul>
+        {% render 'pagination', paginate: paginate %}
+      {%- else -%}
+        <div class="empty-state">
+          <p class="h4">{{ 'blogs.empty' | t }}</p>
+        </div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Blog",
+  "class": "section-main-blog",
+  "enabled_on": { "templates": ["blog"] },
+  "settings": [
+    { "type": "range", "id": "articles_per_page", "label": "Articoli per pagina", "min": 3, "max": 24, "step": 3, "default": 9 },
+    { "type": "range", "id": "columns_desktop", "label": "Colonne su desktop", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "checkbox", "id": "show_tags", "label": "Mostra filtro per tag", "default": true },
+    { "type": "checkbox", "id": "show_date", "label": "Mostra data", "default": true },
+    { "type": "checkbox", "id": "show_excerpt", "label": "Mostra estratto", "default": true },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 }
+  ]
+}
+{% endschema %}

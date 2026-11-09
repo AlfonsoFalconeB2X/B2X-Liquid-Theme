@@ -1,0 +1,164 @@
+<script src="{{ 'carousel.js' | asset_url }}" type="module"></script>
+{%- liquid
+  assign s = section.settings
+  assign track_label = s.heading | escape
+  if track_label == blank
+    assign track_label = 'sections.carousel.label' | t
+  endif
+  assign per_view = s.per_view_desktop
+  assign slide_width = settings.page_width | divided_by: per_view
+  assign sizes = '(min-width: 990px) ' | append: slide_width | append: 'px, (min-width: 750px) 45vw, 80vw'
+
+  case s.slide_ratio
+    when 'square'
+      assign ratio = 1
+    when 'landscape'
+      assign ratio = 1.333
+    else
+      assign ratio = 0.8
+  endcase
+-%}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    <carousel-slider class="carousel" style="--per-view: {{ per_view }}; --per-view-mobile: {{ s.per_view_mobile }};">
+      <div class="carousel__head">
+        {%- render 'section-heading', kicker: s.kicker, heading: s.heading, text: s.text -%}
+        {%- if s.show_arrows and section.blocks.size > 1 -%}
+          <div class="carousel__arrows">
+            <button type="button" class="icon-button carousel__arrow" data-carousel-prev aria-label="{{ 'sections.carousel.previous' | t }}" aria-controls="Carousel-{{ section.id }}">
+              {%- render 'icon', name: 'arrow-left' -%}
+            </button>
+            <button type="button" class="icon-button carousel__arrow" data-carousel-next aria-label="{{ 'sections.carousel.next' | t }}" aria-controls="Carousel-{{ section.id }}">
+              {%- render 'icon', name: 'arrow-right' -%}
+            </button>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <ul class="carousel__track" id="Carousel-{{ section.id }}" role="list" data-carousel-track tabindex="0" aria-label="{{ track_label }}">
+        {%- for block in section.blocks -%}
+          <li class="carousel__slide reveal" {{ block.shopify_attributes }}>
+            {%- case block.type -%}
+              {%- when 'product' -%}
+                {% render 'product-card', product: block.settings.product, section_id: section.id, sizes: sizes, placeholder_index: forloop.index0 %}
+
+              {%- when 'collection' -%}
+                {% render 'collection-card', collection: block.settings.collection, image: block.settings.image, ratio: ratio, sizes: sizes, show_count: true %}
+
+              {%- when 'image' -%}
+                <div class="image-slide">
+                  <div class="media" style="--ratio: {{ ratio }};">
+                    {%- if block.settings.image != blank -%}
+                      {{ block.settings.image | image_url: width: 1400 | image_tag: widths: '360, 540, 720, 960, 1200, 1400', sizes: sizes, loading: 'lazy' }}
+                    {%- else -%}
+                      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+                    {%- endif -%}
+                  </div>
+                  {%- if block.settings.heading != blank or block.settings.text != blank -%}
+                    <div class="image-slide__content on-media">
+                      {%- if block.settings.heading != blank -%}
+                        <h3 class="h4">
+                          {%- if block.settings.link != blank -%}
+                            <a class="card__link" href="{{ block.settings.link }}">{{ block.settings.heading | escape }}</a>
+                          {%- else -%}
+                            {{ block.settings.heading | escape }}
+                          {%- endif -%}
+                        </h3>
+                      {%- endif -%}
+                      {%- if block.settings.text != blank -%}
+                        <p class="text-small">{{ block.settings.text | escape }}</p>
+                      {%- endif -%}
+                    </div>
+                  {%- endif -%}
+                </div>
+            {%- endcase -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </carousel-slider>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Carosello",
+  "class": "section-carousel",
+  "max_blocks": 16,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Etichetta" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Da non perdere" },
+    { "type": "richtext", "id": "text", "label": "Testo" },
+    { "type": "header", "content": "Slide" },
+    { "type": "range", "id": "per_view_desktop", "label": "Slide visibili su desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
+    {
+      "type": "select",
+      "id": "per_view_mobile",
+      "label": "Slide visibili su mobile",
+      "options": [
+        { "value": "1.15", "label": "Una (con anteprima della successiva)" },
+        { "value": "2.2", "label": "Due" }
+      ],
+      "default": "1.15"
+    },
+    {
+      "type": "select",
+      "id": "slide_ratio",
+      "label": "Proporzioni immagini e collezioni",
+      "options": [
+        { "value": "portrait", "label": "Verticali" },
+        { "value": "square", "label": "Quadrate" },
+        { "value": "landscape", "label": "Orizzontali" }
+      ],
+      "default": "portrait"
+    },
+    { "type": "checkbox", "id": "show_arrows", "label": "Mostra le frecce", "default": true },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "full"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Prodotto",
+      "settings": [{ "type": "product", "id": "product", "label": "Prodotto" }]
+    },
+    {
+      "type": "collection",
+      "name": "Collezione",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collezione" },
+        { "type": "image_picker", "id": "image", "label": "Immagine", "info": "Facoltativa: sostituisce l'immagine della collezione." }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Immagine con testo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Immagine" },
+        { "type": "text", "id": "heading", "label": "Titolo", "default": "Titolo della slide" },
+        { "type": "text", "id": "text", "label": "Testo" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carosello",
+      "blocks": [{ "type": "product" }, { "type": "product" }, { "type": "product" }, { "type": "product" }, { "type": "product" }]
+    }
+  ]
+}
+{% endschema %}

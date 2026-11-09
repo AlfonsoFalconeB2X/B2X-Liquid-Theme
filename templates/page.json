@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "width": "reading",
+        "align": "left",
+        "color_scheme": "scheme-1",
+        "padding_top": 56,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

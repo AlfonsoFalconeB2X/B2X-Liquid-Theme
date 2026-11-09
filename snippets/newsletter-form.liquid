@@ -1,0 +1,38 @@
+{%- comment -%}
+  Form di iscrizione alla newsletter (form 'customer' nativo, nessun JS).
+  Parametri: form_id (obbligatorio, unico nella pagina), button_label
+{%- endcomment -%}
+{%- form 'customer', id: form_id, class: 'newsletter-form' -%}
+  <input type="hidden" name="contact[tags]" value="newsletter">
+  {%- if form.posted_successfully? -%}
+    <p class="form-message form-message--success" role="status" tabindex="-1" autofocus>
+      {%- render 'icon', name: 'check', class: 'icon--small' -%}
+      {{ 'newsletter.success' | t }}
+    </p>
+  {%- else -%}
+    <div class="inline-form">
+      <label class="visually-hidden" for="{{ form_id }}-email">{{ 'newsletter.label' | t }}</label>
+      <input
+        class="input"
+        id="{{ form_id }}-email"
+        type="email"
+        name="contact[email]"
+        value="{{ form.email }}"
+        autocomplete="email"
+        autocapitalize="off"
+        spellcheck="false"
+        required
+        placeholder="{{ 'newsletter.placeholder' | t }}"
+        {% if form.errors %}aria-invalid="true" aria-describedby="{{ form_id }}-error"{% endif %}
+      >
+      <button type="submit" class="button">
+        {%- if button_label != blank -%}{{ button_label | escape }}{%- else -%}{{ 'newsletter.button' | t }}{%- endif -%}
+      </button>
+    </div>
+    {%- if form.errors -%}
+      <p class="form-message form-message--error" id="{{ form_id }}-error" role="alert">
+        {{- form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email -}}
+      </p>
+    {%- endif -%}
+  {%- endif -%}
+{%- endform -%}

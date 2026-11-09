@@ -1,0 +1,155 @@
+{%- liquid
+  assign s = section.settings
+  assign half_page = settings.page_width | divided_by: 2
+  assign sizes = '(min-width: 990px) ' | append: half_page | append: 'px, 100vw'
+-%}
+
+{%- comment -%}
+  Punto e prodotto corrispondenti si evidenziano a vicenda al passaggio o al focus: solo CSS (:has), regole
+  generate per ogni blocco. Il clic su un punto apre l'anteprima rapida (o la pagina prodotto senza JS).
+{%- endcomment -%}
+{% style %}
+  {%- for block in section.blocks -%}
+    #Section-{{ section.id }} .look:has([data-look="{{ forloop.index }}"]:is(:hover, :focus-visible)) [data-look="{{ forloop.index }}"] {
+      --look-active: 1;
+    }
+  {%- endfor -%}
+{% endstyle %}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    <div class="look{% if s.image_position == 'right' %} look--image-right{% endif %}">
+      <div class="look__media">
+        <div class="media look__image" style="--ratio: {{ s.image.aspect_ratio | default: 0.8 }};">
+          {%- if s.image != blank -%}
+            {{ s.image | image_url: width: 1800 | image_tag: widths: '480, 750, 1000, 1300, 1600, 1800', sizes: sizes, loading: 'lazy' }}
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+        </div>
+        {%- for block in section.blocks -%}
+          {%- assign look_product = block.settings.product -%}
+          {%- if look_product != blank -%}
+            <a
+              class="hotspot"
+              href="{{ look_product.url }}"
+              style="--x: {{ block.settings.x }}%; --y: {{ block.settings.y }}%;"
+              data-look="{{ forloop.index }}"
+              data-quick-view
+              aria-haspopup="dialog"
+              {{ block.shopify_attributes }}
+            >
+              <span aria-hidden="true">{{ forloop.index }}</span>
+              <span class="visually-hidden">
+                {{- 'sections.shop_the_look.hotspot' | t: number: forloop.index }}: {{ look_product.title | escape -}}
+              </span>
+            </a>
+          {%- else -%}
+            <span
+              class="hotspot"
+              style="--x: {{ block.settings.x }}%; --y: {{ block.settings.y }}%;"
+              data-look="{{ forloop.index }}"
+              aria-hidden="true"
+              {{ block.shopify_attributes }}
+            >
+              {{- forloop.index -}}
+            </span>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="look__content">
+        {%- render 'section-heading', kicker: s.kicker, heading: s.heading, text: s.text -%}
+        <ol class="look__list" role="list">
+          {%- for block in section.blocks -%}
+            {%- assign look_product = block.settings.product -%}
+            <li class="look__item" data-look="{{ forloop.index }}">
+              <span class="look__number" aria-hidden="true">{{ forloop.index }}</span>
+              <span class="media look__thumb" style="--ratio: 1;">
+                {%- if look_product.featured_media -%}
+                  {{ look_product.featured_media.preview_image | image_url: width: 200 | image_tag: widths: '100, 200', sizes: '5rem', loading: 'lazy', alt: '' }}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+              </span>
+              <span class="look__info">
+                {%- if look_product != blank -%}
+                  <a class="look__title" href="{{ look_product.url }}">{{ look_product.title | escape }}</a>
+                  {% render 'price', product: look_product, show_from: true %}
+                {%- else -%}
+                  <span class="look__title">{{ 'products.product.placeholder_title' | t }}</span>
+                {%- endif -%}
+              </span>
+              {%- if look_product != blank -%}
+                <a class="icon-button look__action" href="{{ look_product.url }}" data-quick-view aria-haspopup="dialog">
+                  {%- render 'icon', name: 'plus', class: 'icon--small' -%}
+                  <span class="visually-hidden">{{ 'products.product.quick_view' | t }}: {{ look_product.title | escape }}</span>
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Shop the look",
+  "class": "section-shop-the-look",
+  "max_blocks": 8,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Immagine" },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Posizione immagine (desktop)",
+      "options": [
+        { "value": "left", "label": "Sinistra" },
+        { "value": "right", "label": "Destra" }
+      ],
+      "default": "left"
+    },
+    { "type": "text", "id": "kicker", "label": "Etichetta", "default": "Shop the look" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Completa il look" },
+    { "type": "richtext", "id": "text", "label": "Testo" },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-3" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "boxed"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Prodotto",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Prodotto" },
+        { "type": "range", "id": "x", "label": "Posizione orizzontale", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 },
+        { "type": "range", "id": "y", "label": "Posizione verticale", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop the look",
+      "blocks": [
+        { "type": "hotspot", "settings": { "x": 35, "y": 30 } },
+        { "type": "hotspot", "settings": { "x": 60, "y": 55 } },
+        { "type": "hotspot", "settings": { "x": 45, "y": 80 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

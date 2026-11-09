@@ -1,0 +1,39 @@
+{%- comment -%}
+  Card collezione. Parametri: collection (se vuota mostra un segnaposto), image (immagine alternativa),
+  ratio (numero, default 1), sizes, loading, heading_tag (default h3)
+{%- endcomment -%}
+{%- liquid
+  assign tag = heading_tag | default: 'h3'
+  assign card_image = image | default: collection.featured_image
+  assign ratio = ratio | default: 1
+  assign sizes = sizes | default: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw'
+  assign loading = loading | default: 'lazy'
+-%}
+<div class="collection-card">
+  <div class="media" style="--ratio: {{ ratio }};">
+    {%- if card_image -%}
+      {{
+        card_image
+        | image_url: width: 1100
+        | image_tag:
+          widths: '220, 320, 440, 560, 720, 900, 1100',
+          sizes: sizes,
+          loading: loading,
+          alt: ''
+      }}
+    {%- else -%}
+      {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+  <{{ tag }} class="collection-card__title">
+    {%- if collection != blank -%}
+      <a class="card__link" href="{{ collection.url }}">{{ collection.title | escape }}</a>
+    {%- else -%}
+      {{ 'collections.placeholder_title' | t }}
+    {%- endif -%}
+    {% render 'icon', name: 'arrow-right', class: 'icon--small' %}
+  </{{ tag }}>
+  {%- if show_count and collection != blank -%}
+    <p class="collection-card__count">{{ 'collections.product_count' | t: count: collection.all_products_count }}</p>
+  {%- endif -%}
+</div>

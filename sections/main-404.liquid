@@ -1,0 +1,41 @@
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width page-width--narrow">
+    <div class="empty-state">
+      <p class="kicker">404</p>
+      <h1>{{ 'templates.404.title' | t }}</h1>
+      <p class="text-muted text-lead">{{ 'templates.404.subtext' | t }}</p>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-page__form">
+        <label class="visually-hidden" for="NotFoundSearch">{{ 'search.label' | t }}</label>
+        <div class="search-form__field">
+          {%- render 'icon', name: 'search', class: 'search-form__icon' -%}
+          <input class="search-form__input" id="NotFoundSearch" type="search" name="q" placeholder="{{ 'search.placeholder' | t }}">
+          <button type="submit" class="button button--small">{{ 'search.submit' | t }}</button>
+        </div>
+      </form>
+      <a class="link" href="{{ routes.root_url }}">{{ 'templates.404.back_home' | t }}</a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Pagina non trovata",
+  "class": "section-main-404",
+  "enabled_on": { "templates": ["404"] },
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-2" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "boxed"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 }
+  ]
+}
+{% endschema %}

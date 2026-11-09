@@ -1,0 +1,39 @@
+<{{ block.settings.tag }} class="block-heading {{ block.settings.size }}" {{ block.shopify_attributes }}>
+  {{- block.settings.heading | escape -}}
+</{{ block.settings.tag }}>
+
+{% schema %}
+{
+  "name": "Titolo",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Un titolo che si fa notare" },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Dimensione",
+      "options": [
+        { "value": "h0", "label": "Molto grande" },
+        { "value": "h1", "label": "Grande" },
+        { "value": "h2", "label": "Media" },
+        { "value": "h3", "label": "Piccola" },
+        { "value": "h4", "label": "Molto piccola" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "tag",
+      "label": "Livello del titolo",
+      "info": "Per la struttura della pagina e la SEO. Uno solo h1 per pagina.",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "p", "label": "Paragrafo" }
+      ],
+      "default": "h2"
+    }
+  ],
+  "presets": [{ "name": "Titolo" }]
+}
+{% endschema %}

@@ -1,0 +1,35 @@
+{%- comment -%}
+  Quantità (pagina prodotto e anteprima rapida), collegata al form con l'attributo form.
+  Parametri: variant, section_id, form_id, attributes (block.shopify_attributes)
+{%- endcomment -%}
+{%- assign rule = variant.quantity_rule -%}
+<div class="field" data-product-part="quantity" {{ attributes }}>
+  <label class="field__label" for="Quantity-{{ section_id }}">{{ 'products.product.quantity' | t }}</label>
+  <quantity-input class="quantity">
+    <button type="button" class="quantity__button" data-quantity="minus" aria-label="{{ 'products.product.decrease_quantity' | t }}">
+      {%- render 'icon', name: 'minus', class: 'icon--small' -%}
+    </button>
+    <input
+      class="quantity__input"
+      type="number"
+      id="Quantity-{{ section_id }}"
+      name="quantity"
+      value="{{ rule.min }}"
+      min="{{ rule.min }}"
+      step="{{ rule.increment }}"
+      {% if rule.max != null %}max="{{ rule.max }}"{% endif %}
+      form="{{ form_id }}"
+      data-preserve
+    >
+    <button type="button" class="quantity__button" data-quantity="plus" aria-label="{{ 'products.product.increase_quantity' | t }}">
+      {%- render 'icon', name: 'plus', class: 'icon--small' -%}
+    </button>
+  </quantity-input>
+  {%- if rule.min > 1 or rule.increment > 1 or rule.max != null -%}
+    <p class="text-small text-muted">
+      {%- if rule.increment > 1 -%}{{ 'products.product.quantity_increment' | t: quantity: rule.increment }} {% endif -%}
+      {%- if rule.min > 1 -%}{{ 'products.product.quantity_min' | t: quantity: rule.min }} {% endif -%}
+      {%- if rule.max != null -%}{{ 'products.product.quantity_max' | t: quantity: rule.max }}{%- endif -%}
+    </p>
+  {%- endif -%}
+</div>

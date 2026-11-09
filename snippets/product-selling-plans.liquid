@@ -1,0 +1,54 @@
+{%- comment -%}
+  Opzioni di acquisto in abbonamento (selling plans), dentro il form del prodotto. Nessun JS.
+  Parametri: product, variant, section_id
+{%- endcomment -%}
+{%- if product.selling_plan_groups.size > 0 -%}
+  {%- liquid
+    assign selected_plan_id = variant.selected_selling_plan_allocation.selling_plan.id | default: product.selected_selling_plan.id
+    assign first_plan_checked = false
+    if product.requires_selling_plan and selected_plan_id == blank
+      assign first_plan_checked = true
+    endif
+  -%}
+  <fieldset class="selling-plans">
+    <legend class="option__legend">{{ 'products.product.selling_plans.title' | t }}</legend>
+
+    {%- unless product.requires_selling_plan -%}
+      <label class="selling-plan">
+        <input type="radio" name="selling_plan" value=""{% if selected_plan_id == blank %} checked{% endif %}>
+        <span class="selling-plan__name">{{ 'products.product.selling_plans.one_time' | t }}</span>
+        <span class="selling-plan__price">{{ variant.price | money }}</span>
+      </label>
+    {%- endunless -%}
+
+    {%- for group in product.selling_plan_groups -%}
+      {%- for plan in group.selling_plans -%}
+        {%- liquid
+          assign allocation = variant.selling_plan_allocations | where: 'selling_plan_id', plan.id | first
+          assign is_checked = false
+          if plan.id == selected_plan_id
+            assign is_checked = true
+          elsif first_plan_checked and forloop.first
+            assign is_checked = true
+            assign first_plan_checked = false
+          endif
+        -%}
+        {%- if allocation -%}
+          <label class="selling-plan">
+            <input type="radio" name="selling_plan" value="{{ plan.id }}"{% if is_checked %} checked{% endif %}>
+            <span class="selling-plan__name">
+              {{- group.name | escape }} · {{ plan.name | escape -}}
+              {%- if plan.description != blank -%}<span class="selling-plan__description">{{ plan.description | escape }}</span>{%- endif -%}
+            </span>
+            <span class="selling-plan__price">
+              {%- if allocation.compare_at_price > allocation.price -%}
+                <s class="price__compare">{{ allocation.compare_at_price | money }}</s>
+              {%- endif -%}
+              {{ allocation.price | money }}
+            </span>
+          </label>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  </fieldset>
+{%- endif -%}

@@ -1,0 +1,4 @@
+# Ambienti della Shopify CLI (`shopify theme dev --environment local`)
+[environments.local]
+store = "b2x-srl.myshopify.com"
+# nessun theme: la CLI usa un tema di sviluppo personale e nascosto

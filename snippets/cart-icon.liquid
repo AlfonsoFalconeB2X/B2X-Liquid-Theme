@@ -1,0 +1,13 @@
+{%- comment -%}
+  Icona del carrello nell'header. Aggiornata via Section Rendering API dalla section `cart-icon-bubble`
+  (attributo data-cart-section). Con il carrello a cassetto il clic apre il cassetto (theme.js).
+{%- endcomment -%}
+<a href="{{ routes.cart_url }}" class="icon-button header__cart" id="cart-icon-bubble" data-cart-toggle data-cart-section="cart-icon-bubble">
+  {%- render 'icon', name: 'bag' -%}
+  {%- if cart.item_count > 0 -%}
+    <span class="cart-count" aria-hidden="true">{{ cart.item_count | at_most: 99 }}</span>
+    <span class="visually-hidden">{{ 'header.cart_count' | t: count: cart.item_count }}</span>
+  {%- else -%}
+    <span class="visually-hidden">{{ 'header.cart' | t }}</span>
+  {%- endif -%}
+</a>

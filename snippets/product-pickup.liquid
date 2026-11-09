@@ -1,0 +1,45 @@
+{%- comment -%}
+  Ritiro in negozio per la variante (store_availabilities, solo Liquid). Parte aggiornata al cambio di variante:
+  il contenitore c'è sempre, anche vuoto.
+  Parametri: variant, attributes (block.shopify_attributes)
+{%- endcomment -%}
+{%- assign pickup_locations = variant.store_availabilities | where: 'pick_up_enabled', true -%}
+<div class="pickup" data-product-part="pickup" {{ attributes }}>
+  {%- if pickup_locations.size > 0 -%}
+    {%- assign closest = pickup_locations.first -%}
+    <div class="pickup__summary">
+      {%- if closest.available -%}
+        <span class="stock__dot" aria-hidden="true"></span>
+        <div>
+          <p>{{ 'products.product.pickup.available_html' | t: location: closest.location.name }}</p>
+          <p class="text-small text-muted">{{ closest.pick_up_time }}</p>
+        </div>
+      {%- else -%}
+        <span class="stock__dot stock__dot--out" aria-hidden="true"></span>
+        <p>{{ 'products.product.pickup.unavailable_html' | t: location: closest.location.name }}</p>
+      {%- endif -%}
+    </div>
+
+    <details class="pickup__details">
+      <summary class="link">{{ 'products.product.pickup.show_all' | t: count: pickup_locations.size }}</summary>
+      <ul class="pickup__list" role="list">
+        {%- for availability in pickup_locations -%}
+          <li class="pickup__location">
+            <p><strong>{{ availability.location.name | escape }}</strong></p>
+            <p class="text-small">
+              {%- if availability.available -%}
+                {{ 'products.product.pickup.in_stock' | t }} · {{ availability.pick_up_time }}
+              {%- else -%}
+                {{ 'products.product.pickup.out_of_stock' | t }}
+              {%- endif -%}
+            </p>
+            <address class="text-small text-muted">{{ availability.location.address | format_address }}</address>
+            {%- if availability.location.address.phone != blank -%}
+              <p class="text-small"><a href="tel:{{ availability.location.address.phone }}">{{ availability.location.address.phone }}</a></p>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </details>
+  {%- endif -%}
+</div>

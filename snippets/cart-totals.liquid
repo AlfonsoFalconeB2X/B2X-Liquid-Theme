@@ -1,0 +1,32 @@
+{%- comment -%}
+  Riepilogo del carrello: subtotale, sconti dell'ordine, totale e nota su tasse e spedizione.
+{%- endcomment -%}
+<div class="cart-totals">
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    <div class="cart-totals__row">
+      <span>{{ 'cart.subtotal' | t }}</span>
+      <span>{{ cart.items_subtotal_price | money }}</span>
+    </div>
+    {%- for discount in cart.cart_level_discount_applications -%}
+      <div class="cart-totals__row cart-totals__row--discount">
+        <span>{{ discount.title | escape }}</span>
+        <span>−{{ discount.total_allocated_amount | money }}</span>
+      </div>
+    {%- endfor -%}
+  {%- endif -%}
+
+  <div class="cart-totals__row cart-totals__row--total">
+    <span>{{ 'cart.total' | t }}</span>
+    <span>{{ cart.total_price | money_with_currency }}</span>
+  </div>
+
+  <p class="cart-totals__note">
+    {%- if cart.duties_included and cart.taxes_included -%}
+      {{ 'cart.taxes_duties_included' | t }}
+    {%- elsif cart.taxes_included -%}
+      {{ 'cart.taxes_included' | t }}
+    {%- else -%}
+      {{ 'cart.taxes_excluded' | t }}
+    {%- endif -%}
+  </p>
+</div>

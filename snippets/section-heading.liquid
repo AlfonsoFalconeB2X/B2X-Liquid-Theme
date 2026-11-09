@@ -1,0 +1,32 @@
+{%- comment -%}
+  Intestazione standard delle section: etichetta, titolo, testo e link "vedi tutto".
+  Parametri: kicker, heading, text (richtext), link_label, link_url, align ('left' | 'center'), heading_tag (default h2)
+{%- endcomment -%}
+{%- liquid
+  assign tag = heading_tag | default: 'h2'
+  assign has_link = false
+  if link_label != blank and link_url != blank
+    assign has_link = true
+  endif
+-%}
+{%- if kicker != blank or heading != blank or text != blank or has_link -%}
+  <div class="section-heading section-heading--{{ align | default: 'left' }}">
+    <div class="section-heading__text">
+      {%- if kicker != blank -%}
+        <p class="kicker">{{ kicker | escape }}</p>
+      {%- endif -%}
+      {%- if heading != blank -%}
+        <{{ tag }} class="h2">{{ heading | escape }}</{{ tag }}>
+      {%- endif -%}
+      {%- if text != blank -%}
+        <div class="rte text-muted">{{ text }}</div>
+      {%- endif -%}
+    </div>
+    {%- if has_link -%}
+      <a class="link" href="{{ link_url }}">
+        {{- link_label | escape -}}
+        {% render 'icon', name: 'arrow-right', class: 'icon--small' %}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}

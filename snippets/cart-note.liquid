@@ -1,0 +1,67 @@
+{%- comment -%}
+  Nota dell'ordine e attributi del carrello (fino a due, da Impostazioni tema → Carrello).
+  Con JS si salvano mentre il cliente scrive (<cart-note> in theme.js); sulla pagina carrello, senza JS, si inviano
+  insieme al form (attributo form). Le chiavi degli attributi sono le etichette: il merchant le legge nell'ordine.
+  Parametri: context ('drawer' | 'page'), show_note, form_id (solo pagina)
+{%- endcomment -%}
+{%- liquid
+  assign has_attributes = false
+  for i in (1..2)
+    assign label_key = 'cart_attribute_' | append: i | append: '_label'
+    if settings[label_key] != blank
+      assign has_attributes = true
+    endif
+  endfor
+-%}
+{%- if show_note or has_attributes -%}
+  <cart-note class="cart-note">
+    {%- if show_note -%}
+      <div class="field">
+        <label class="field__label" for="CartNote-{{ context }}">{{ 'cart.note' | t }}</label>
+        <textarea class="textarea textarea--small" id="CartNote-{{ context }}" name="note" rows="2"{% if form_id %} form="{{ form_id }}"{% endif %}>{{ cart.note }}</textarea>
+      </div>
+    {%- endif -%}
+
+    {%- for i in (1..2) -%}
+      {%- liquid
+        assign label_key = 'cart_attribute_' | append: i | append: '_label'
+        assign type_key = 'cart_attribute_' | append: i | append: '_type'
+        assign label = settings[label_key] | strip
+        assign field_id = 'CartAttribute-' | append: context | append: '-' | append: i
+      -%}
+      {%- if label != blank -%}
+        {%- assign current_value = cart.attributes[label] -%}
+        {%- if settings[type_key] == 'checkbox' -%}
+          {%- assign yes = 'cart.attribute_yes' | t -%}
+          <label class="checkbox" for="{{ field_id }}">
+            <input type="hidden" name="attributes[{{ label | escape }}]" value=""{% if form_id %} form="{{ form_id }}"{% endif %}>
+            <input
+              type="checkbox"
+              id="{{ field_id }}"
+              name="attributes[{{ label | escape }}]"
+              value="{{ yes }}"
+              data-attribute="{{ label | escape }}"
+              {% if current_value != blank %}checked{% endif %}
+              {% if form_id %}form="{{ form_id }}"{% endif %}
+            >
+            <span>{{ label | escape }}</span>
+          </label>
+        {%- else -%}
+          <div class="field">
+            <label class="field__label" for="{{ field_id }}">{{ label | escape }}</label>
+            <input
+              class="input"
+              id="{{ field_id }}"
+              type="text"
+              name="attributes[{{ label | escape }}]"
+              value="{{ current_value | escape }}"
+              data-attribute="{{ label | escape }}"
+              {% if form_id %}form="{{ form_id }}"{% endif %}
+            >
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+    <p class="text-small text-muted cart-note__status" role="status" data-note-status></p>
+  </cart-note>
+{%- endif -%}

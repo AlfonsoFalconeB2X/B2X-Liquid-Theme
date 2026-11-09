@@ -1,0 +1,123 @@
+{%- liquid
+  assign s = section.settings
+  assign columns = s.columns_desktop
+  assign columns_tablet = columns | at_most: 3
+  assign column_width = settings.page_width | divided_by: columns
+  assign sizes = '(min-width: 990px) ' | append: column_width | append: 'px, (min-width: 750px) 33vw, 50vw'
+
+  case s.image_ratio
+    when 'portrait'
+      assign ratio = 0.8
+    when 'landscape'
+      assign ratio = 1.333
+    else
+      assign ratio = 1
+  endcase
+-%}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    {%- render 'section-heading',
+      kicker: s.kicker,
+      heading: s.heading,
+      text: s.text,
+      link_label: s.link_label,
+      link_url: s.link_url,
+      align: s.heading_align
+    -%}
+
+    <ul
+      class="grid{% if s.slider_mobile %} grid--slider{% endif %}"
+      role="list"
+      style="--cols-mobile: 2; --cols-tablet: {{ columns_tablet }}; --cols-desktop: {{ columns }}; --slide-width: 44%;"
+    >
+      {%- for block in section.blocks -%}
+        <li class="reveal" {{ block.shopify_attributes }}>
+          {% render 'collection-card',
+            collection: block.settings.collection,
+            image: block.settings.image,
+            ratio: ratio,
+            sizes: sizes,
+            show_count: s.show_count
+          %}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Elenco collezioni",
+  "class": "section-collection-list",
+  "max_blocks": 12,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Etichetta" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Esplora le collezioni" },
+    { "type": "richtext", "id": "text", "label": "Testo" },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Allineamento intestazione",
+      "options": [
+        { "value": "left", "label": "Sinistra" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "left"
+    },
+    { "type": "text", "id": "link_label", "label": "Etichetta link" },
+    { "type": "url", "id": "link_url", "label": "Link" },
+    { "type": "header", "content": "Griglia" },
+    { "type": "range", "id": "columns_desktop", "label": "Colonne su desktop", "min": 2, "max": 6, "step": 1, "default": 4 },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporzioni immagini",
+      "options": [
+        { "value": "square", "label": "Quadrate" },
+        { "value": "portrait", "label": "Verticali" },
+        { "value": "landscape", "label": "Orizzontali" }
+      ],
+      "default": "square"
+    },
+    { "type": "checkbox", "id": "show_count", "label": "Mostra numero di prodotti", "default": false },
+    { "type": "checkbox", "id": "slider_mobile", "label": "Scorrimento orizzontale su mobile", "default": true },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "full"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collezione",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collezione" },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Immagine",
+          "info": "Facoltativa: sostituisce l'immagine della collezione."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Elenco collezioni",
+      "blocks": [{ "type": "collection" }, { "type": "collection" }, { "type": "collection" }, { "type": "collection" }]
+    }
+  ]
+}
+{% endschema %}

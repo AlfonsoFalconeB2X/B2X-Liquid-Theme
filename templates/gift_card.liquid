@@ -1,0 +1,87 @@
+{%- layout none -%}
+{%- liquid
+  assign initial_value = gift_card.initial_value | money
+  assign expires_on = gift_card.expires_on | date: '%d/%m/%Y'
+-%}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>{{ 'gift_card.title' | t: value: initial_value }} &ndash; {{ shop.name }}</title>
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 96, height: 96 }}">
+    {%- endif -%}
+    {% render 'theme-styles' %}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
+    {{ content_for_header }}
+  </head>
+
+  <body class="color-{{ settings.page_color_scheme }}">
+    <main class="section section--boxed color-scheme-2 gift-card" style="--pt: 64px; --pb: 64px;">
+      <div class="section__inner page-width--narrow">
+        <div class="empty-state gift-card__content">
+          <p class="header__logo-text">{{ shop.name }}</p>
+          <h1 class="h2">{{ 'gift_card.heading' | t }}</h1>
+
+          <div class="gift-card__value">
+            {%- if gift_card.enabled == false or gift_card.expired -%}
+              <p class="badge badge--neutral">{{ 'gift_card.expired' | t }}</p>
+            {%- endif -%}
+            <p class="h0">{{ gift_card.balance | money }}</p>
+            {%- if gift_card.balance != gift_card.initial_value -%}
+              <p class="text-muted">{{ 'gift_card.initial_value' | t: value: initial_value }}</p>
+            {%- endif -%}
+            {%- if gift_card.expires_on -%}
+              <p class="text-muted text-small">{{ 'gift_card.expires_on' | t: date: expires_on }}</p>
+            {%- endif -%}
+          </div>
+
+          <div class="gift-card__code">
+            <p class="field__label">{{ 'gift_card.code' | t }}</p>
+            <p class="gift-card__code-value" id="GiftCardCode">{{ gift_card.code | format_code }}</p>
+            <button type="button" class="button button--secondary button--small" id="CopyGiftCardCode">{{ 'gift_card.copy' | t }}</button>
+            <p class="visually-hidden" role="status" id="CopyStatus"></p>
+          </div>
+
+          <div id="GiftCardQr" class="gift-card__qr" data-identifier="{{ gift_card.qr_identifier }}" aria-hidden="true"></div>
+
+          <div class="button-group">
+            <a class="button" href="{{ shop.url }}" target="_blank" rel="noopener">{{ 'gift_card.shop' | t }}</a>
+            {%- if gift_card.pass_url -%}
+              <a href="{{ gift_card.pass_url }}" class="gift-card__wallet">
+                <img src="{{ 'gift-card/add-to-apple-wallet.svg' | shopify_asset_url }}" width="120" height="40" alt="{{ 'gift_card.apple_wallet' | t }}" loading="lazy">
+              </a>
+            {%- endif -%}
+            <button type="button" class="button button--secondary" onclick="window.print();">{{ 'gift_card.print' | t }}</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Lo script del QR è in differita: si esegue prima di DOMContentLoaded.
+      document.addEventListener('DOMContentLoaded', function () {
+        var qr = document.getElementById('GiftCardQr');
+        if (qr && window.QRCode) {
+          new QRCode(qr, { text: qr.dataset.identifier, width: 120, height: 120 });
+        }
+        var button = document.getElementById('CopyGiftCardCode');
+        var status = document.getElementById('CopyStatus');
+        if (button && navigator.clipboard) {
+          button.addEventListener('click', function () {
+            navigator.clipboard.writeText({{ gift_card.code | json }}).then(function () {
+              status.textContent = {{ 'gift_card.copied' | t | json }};
+              button.textContent = {{ 'gift_card.copied' | t | json }};
+            });
+          });
+        } else if (button) {
+          button.hidden = true;
+        }
+      });
+    </script>
+  </body>
+</html>

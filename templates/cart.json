@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-cart",
+      "settings": {
+        "show_note": false,
+        "show_dynamic_checkout": true,
+        "color_scheme": "scheme-1",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Potrebbe interessarti",
+        "collection": "",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "slider_mobile": true,
+        "link_label": "",
+        "color_scheme": "scheme-1",
+        "section_style": "full",
+        "padding_top": 32,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main", "featured_collection"]
+}

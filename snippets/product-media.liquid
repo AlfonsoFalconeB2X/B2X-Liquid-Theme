@@ -1,0 +1,55 @@
+{%- comment -%}
+  Un media della galleria prodotto.
+  Parametri: media, title (titolo del prodotto, ripiego per i nomi accessibili), ratio (numero), sizes,
+  loading ('eager' per il primo), priority ('high' per il primo)
+  - immagine: image_tag responsive
+  - video Shopify: player nativo con anteprima
+  - YouTube/Vimeo: anteprima, il player si carica solo al clic (deferred-media in theme.js)
+  - modello 3D: anteprima statica
+{%- endcomment -%}
+{%- liquid
+  assign loading = loading | default: 'lazy'
+  assign priority = priority | default: 'auto'
+  assign media_title = media.alt | default: title | escape
+-%}
+{%- case media.media_type -%}
+  {%- when 'video' -%}
+    <div class="media" style="--ratio: {{ ratio }};">
+      {{
+        media
+        | video_tag:
+          image_size: '1600x',
+          controls: true,
+          playsinline: true,
+          preload: 'none',
+          muted: false
+      }}
+    </div>
+
+  {%- when 'external_video' -%}
+    <deferred-media class="media" style="--ratio: {{ ratio }};">
+      {{ media.preview_image | image_url: width: 1600 | image_tag: widths: '480, 750, 1000, 1300, 1600', sizes: sizes, loading: loading, alt: '' }}
+      <button type="button" class="video-embed__poster" data-deferred-play>
+        <span class="video-embed__play">{% render 'icon', name: 'play', class: 'icon--fill' %}</span>
+        <span class="visually-hidden">{{ 'sections.video.play' | t: title: media_title }}</span>
+      </button>
+      <template>{{ media | external_video_url: autoplay: true | external_video_tag }}</template>
+    </deferred-media>
+
+  {%- else -%}
+    <div class="media" style="--ratio: {{ ratio }};">
+      {%- if media.preview_image -%}
+        {{
+          media.preview_image
+          | image_url: width: 2000
+          | image_tag:
+            widths: '360, 480, 640, 750, 900, 1100, 1300, 1600, 2000',
+            sizes: sizes,
+            loading: loading,
+            fetchpriority: priority
+        }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
+{%- endcase -%}

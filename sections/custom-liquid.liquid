@@ -1,0 +1,35 @@
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    {{ section.settings.custom_liquid }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Liquid personalizzato",
+  "class": "section-custom-liquid",
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Codice Liquid",
+      "info": "Per snippet di app, embed o codice HTML/Liquid personalizzato."
+    },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "full"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 40 }
+  ],
+  "presets": [{ "name": "Liquid personalizzato" }]
+}
+{% endschema %}

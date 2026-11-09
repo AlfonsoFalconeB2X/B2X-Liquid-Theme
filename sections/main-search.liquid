@@ -1,0 +1,167 @@
+{{ 'collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'collection.js' | asset_url }}" type="module"></script>
+
+{%- liquid
+  assign s = section.settings
+  assign columns = s.columns_desktop
+  assign columns_tablet = columns | at_most: 3
+  assign terms = search.terms | escape
+  assign show_filters = false
+  if s.enable_filtering and search.performed and search.filters.size > 0
+    assign show_filters = true
+  endif
+  assign layout = 'drawer'
+  if show_filters and s.filter_layout == 'sidebar'
+    assign layout = 'sidebar'
+  endif
+  assign sort_by = search.sort_by | default: search.default_sort_by
+  assign column_width = settings.page_width | divided_by: columns
+  assign sizes = '(min-width: 990px) ' | append: column_width | append: 'px, (min-width: 750px) 33vw, 50vw'
+  assign search_url = routes.search_url
+  assign terms_encoded = search.terms | url_encode
+  assign clear_url = routes.search_url | append: '?q=' | append: terms_encoded | append: '&options%5Bprefix%5D=last'
+-%}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    <div class="page-header page-header--center">
+      <h1>{{ 'search.title' | t }}</h1>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-page__form">
+        <label class="visually-hidden" for="SearchPage-{{ section.id }}">{{ 'search.label' | t }}</label>
+        <div class="search-form__field">
+          {%- render 'icon', name: 'search', class: 'search-form__icon' -%}
+          <input class="search-form__input" id="SearchPage-{{ section.id }}" type="search" name="q" value="{{ terms }}" placeholder="{{ 'search.placeholder' | t }}">
+          <input type="hidden" name="options[prefix]" value="last">
+          <button type="submit" class="button button--small">{{ 'search.submit' | t }}</button>
+        </div>
+      </form>
+    </div>
+
+    {%- if search.performed -%}
+      {%- paginate search.results by s.results_per_page -%}
+        <facets-form class="collection-layout collection-layout--{{ layout }}" data-section="{{ section.id }}">
+          <div class="toolbar">
+            {%- if show_filters -%}
+              <button type="button" class="button button--secondary button--small toolbar__filters" popovertarget="Facets-{{ section.id }}">
+                {%- render 'icon', name: 'filter', class: 'icon--small' -%}
+                {{ 'collections.filters.title' | t }}
+              </button>
+            {%- endif -%}
+            <p class="toolbar__count" role="status" data-facets-part="count">
+              {{- 'search.results_count' | t: count: search.results_count, terms: terms -}}
+            </p>
+            {%- if s.enable_sorting and search.results_count > 0 -%}
+              <div class="toolbar__sort">
+                <label class="toolbar__sort-label" for="SortBy-{{ section.id }}">{{ 'collections.sort.label' | t }}</label>
+                <div class="select-wrap select-wrap--small">
+                  <select class="select" id="SortBy-{{ section.id }}" name="sort_by" form="FacetsForm-{{ section.id }}">
+                    {%- for option in search.sort_options -%}
+                      <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name | escape }}</option>
+                    {%- endfor -%}
+                  </select>
+                  {%- render 'icon', name: 'chevron-down', class: 'icon--small' -%}
+                </div>
+                <button type="submit" form="FacetsForm-{{ section.id }}" class="button button--secondary button--small no-js-only">
+                  {{- 'collections.filters.apply' | t -}}
+                </button>
+              </div>
+            {%- endif -%}
+          </div>
+
+          <div class="collection-layout__body">
+            {%- if show_filters -%}
+              {% render 'facets', results: search, section_id: section.id, results_url: search_url, terms: search.terms %}
+            {%- else -%}
+              <form id="FacetsForm-{{ section.id }}" action="{{ search_url }}" method="get" data-facets-form hidden>
+                <input type="hidden" name="q" value="{{ terms }}">
+                <input type="hidden" name="options[prefix]" value="last">
+              </form>
+            {%- endif -%}
+
+            <div class="collection-layout__results">
+              {%- if show_filters -%}
+                {% render 'active-filters', results: search, clear_url: clear_url %}
+              {%- endif -%}
+
+              <div class="collection-results" data-facets-part="results">
+                {%- if search.results_count > 0 -%}
+                  {%- liquid
+                    assign products = search.results | where: 'object_type', 'product'
+                    assign others = search.results | where: 'object_type', 'article'
+                    assign pages = search.results | where: 'object_type', 'page'
+                    assign others = others | concat: pages
+                  -%}
+                  {%- if products.size > 0 -%}
+                    <ul class="grid" role="list" style="--cols-mobile: 2; --cols-tablet: {{ columns_tablet }}; --cols-desktop: {{ columns }};">
+                      {%- for product in products -%}
+                        <li>{% render 'product-card', product: product, section_id: section.id, sizes: sizes %}</li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+
+                  {%- if others.size > 0 -%}
+                    <div class="search-results__group">
+                      <h2 class="h4">{{ 'search.pages_and_articles' | t }}</h2>
+                      <ul class="search-results__list" role="list">
+                        {%- for item in others -%}
+                          <li>
+                            <a class="search-result" href="{{ item.url }}">
+                              <span class="search-result__type">
+                                {%- if item.object_type == 'article' -%}{{ 'search.article' | t }}{%- else -%}{{ 'search.page' | t }}{%- endif -%}
+                              </span>
+                              <span class="search-result__title">{{ item.title | escape }}</span>
+                              {%- assign excerpt = item.excerpt | default: item.content | strip_html | truncatewords: 22 -%}
+                              {%- if excerpt != blank -%}
+                                <span class="search-result__excerpt">{{ excerpt }}</span>
+                              {%- endif -%}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  {%- endif -%}
+
+                  {% render 'pagination', paginate: paginate %}
+                {%- else -%}
+                  <div class="empty-state">
+                    <span class="empty-state__icon">{% render 'icon', name: 'search' %}</span>
+                    <p class="h4">{{ 'search.no_results' | t: terms: terms }}</p>
+                    <p class="text-muted">{{ 'search.no_results_hint' | t }}</p>
+                  </div>
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+        </facets-form>
+      {%- endpaginate -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Risultati di ricerca",
+  "class": "section-main-search",
+  "enabled_on": { "templates": ["search"] },
+  "settings": [
+    { "type": "range", "id": "results_per_page", "label": "Risultati per pagina", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "columns_desktop", "label": "Colonne su desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Abilita filtri", "default": true },
+    {
+      "type": "select",
+      "id": "filter_layout",
+      "label": "Filtri su desktop",
+      "options": [
+        { "value": "sidebar", "label": "Barra laterale" },
+        { "value": "drawer", "label": "Pannello" }
+      ],
+      "default": "drawer"
+    },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Abilita ordinamento", "default": true },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,13 @@
+# File esclusi da `shopify theme push` / `shopify theme dev`
+.git/*
+.github/*
+.vscode/*
+.claude/*
+.DS_Store
+README.md
+CLAUDE.md
+shopify.theme.toml
+.shopifyignore
+.gitignore
+.editorconfig
+.theme-check.yml

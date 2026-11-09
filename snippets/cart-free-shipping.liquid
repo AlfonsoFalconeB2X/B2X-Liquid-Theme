@@ -1,0 +1,36 @@
+{%- comment -%}
+  Barra della spedizione gratuita. Soglie per valuta da Impostazioni tema → Carrello ("EUR:60, CHF:65"):
+  senza una soglia per la valuta corrente la barra non compare (Liquid non espone tassi di cambio).
+  theme.js la anima dal valore precedente dopo ogni modifica al carrello.
+{%- endcomment -%}
+{%- liquid
+  assign threshold = 0
+  assign pairs = settings.free_shipping_thresholds | split: ','
+  for pair in pairs
+    assign parts = pair | split: ':'
+    assign code = parts[0] | strip | upcase
+    if code == cart.currency.iso_code and parts.size > 1
+      assign threshold = parts[1] | strip | replace: ',', '.' | times: 100 | round
+    endif
+  endfor
+-%}
+{%- if threshold > 0 and cart.item_count > 0 -%}
+  {%- liquid
+    assign remaining = threshold | minus: cart.total_price
+    assign progress = cart.total_price | times: 100 | divided_by: threshold | at_most: 100
+    assign remaining_money = remaining | money
+  -%}
+  <div class="free-shipping{% if remaining <= 0 %} free-shipping--reached{% endif %}" data-free-shipping style="--progress: {{ progress }}%;">
+    <p class="free-shipping__text">
+      {%- render 'icon', name: 'truck', class: 'icon--small' -%}
+      {%- if remaining > 0 -%}
+        <span>{{ 'cart.free_shipping.remaining_html' | t: amount: remaining_money }}</span>
+      {%- else -%}
+        <span>{{ 'cart.free_shipping.reached' | t }}</span>
+      {%- endif -%}
+    </p>
+    <div class="free-shipping__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress }}" aria-label="{{ 'cart.free_shipping.label' | t }}">
+      <span class="free-shipping__fill"></span>
+    </div>
+  </div>
+{%- endif -%}

@@ -1,0 +1,44 @@
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width page-width--{{ section.settings.width }}">
+    <div class="page-header{% if section.settings.align == 'center' %} page-header--center{% endif %}">
+      <h1>{{ page.title | escape }}</h1>
+    </div>
+    {%- if page.content != blank -%}
+      <div class="rte page-content">{{ page.content }}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Pagina",
+  "class": "section-main-page",
+  "enabled_on": { "templates": ["page"] },
+  "settings": [
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Larghezza del testo",
+      "options": [
+        { "value": "reading", "label": "Lettura" },
+        { "value": "narrow", "label": "Media" }
+      ],
+      "default": "reading"
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Allineamento titolo",
+      "options": [
+        { "value": "left", "label": "Sinistra" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "left"
+    },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 56 }
+  ]
+}
+{% endschema %}

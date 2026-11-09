@@ -1,0 +1,49 @@
+{%- comment -%}
+  Filtri attivi come chip rimovibili. Parametri: results (collection o search), clear_url
+{%- endcomment -%}
+{%- liquid
+  assign has_active = false
+  for filter in results.filters
+    if filter.active_values.size > 0
+      assign has_active = true
+    elsif filter.type == 'price_range'
+      if filter.min_value.value != null or filter.max_value.value != null
+        assign has_active = true
+      endif
+    endif
+  endfor
+-%}
+<div class="active-filters" data-facets-part="active">
+  {%- if has_active -%}
+    <ul class="tag-list" role="list" aria-label="{{ 'collections.filters.active' | t }}">
+      {%- for filter in results.filters -%}
+        {%- for value in filter.active_values -%}
+          <li>
+            <a class="chip-link" href="{{ value.url_to_remove }}" data-facets-link>
+              {{- filter.label | escape }}: {{ value.label | escape -}}
+              {%- render 'icon', name: 'close', class: 'icon--small' -%}
+              <span class="visually-hidden">{{ 'collections.filters.remove' | t }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+        {%- if filter.type == 'price_range' -%}
+          {%- if filter.min_value.value != null or filter.max_value.value != null -%}
+            <li>
+              <a class="chip-link" href="{{ filter.url_to_remove }}" data-facets-link>
+                {{- filter.label | escape }}:
+                {% if filter.min_value.value %}{{ filter.min_value.value | money }}{% else %}{{ 0 | money }}{% endif %}
+                –
+                {% if filter.max_value.value %}{{ filter.max_value.value | money }}{% else %}{{ filter.range_max | money }}{% endif -%}
+                {%- render 'icon', name: 'close', class: 'icon--small' -%}
+                <span class="visually-hidden">{{ 'collections.filters.remove' | t }}</span>
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+      <li>
+        <a class="chip-link chip-link--clear" href="{{ clear_url }}" data-facets-link>{{ 'collections.filters.clear_all' | t }}</a>
+      </li>
+    </ul>
+  {%- endif -%}
+</div>

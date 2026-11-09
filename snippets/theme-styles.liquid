@@ -1,0 +1,91 @@
+{%- comment -%}
+  Font e variabili CSS che dipendono dalle impostazioni del tema.
+  Ogni schema di colore diventa una classe `.color-<id>` che definisce i colori di base
+  e ne ricava gli altri con color-mix: sezioni, card e pannelli usano solo queste variabili.
+{%- endcomment -%}
+{%- liquid
+  assign body_font = settings.type_body_font
+  assign heading_font = settings.type_heading_font
+  assign body_font_bold = body_font | font_modify: 'weight', 'bold'
+  assign body_font_italic = body_font | font_modify: 'style', 'italic'
+  assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
+  assign body_weight_bold = body_font.weight | plus: 300 | at_most: 900
+  if body_font_bold
+    assign body_weight_bold = body_font_bold.weight
+  endif
+-%}
+
+{%- unless body_font.system? -%}
+  <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+  {{ body_font | font_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: true }}
+{%- endunless -%}
+{%- unless heading_font.system? or heading_font == body_font -%}
+  {{ heading_font | font_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: true }}
+{%- endunless -%}
+
+{% style %}
+  {{ body_font | font_face: font_display: 'swap' }}
+  {{ body_font_bold | font_face: font_display: 'swap' }}
+  {{ body_font_italic | font_face: font_display: 'swap' }}
+  {{ body_font_bold_italic | font_face: font_display: 'swap' }}
+  {{ heading_font | font_face: font_display: 'swap' }}
+
+  :root {
+    --font-body-family: {{ body_font.family }}, {{ body_font.fallback_families }};
+    --font-body-style: {{ body_font.style }};
+    --font-body-weight: {{ body_font.weight }};
+    --font-body-weight-bold: {{ body_weight_bold }};
+    --font-heading-family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+    --font-heading-style: {{ heading_font.style }};
+    --font-heading-weight: {{ heading_font.weight }};
+    --heading-scale: {{ settings.heading_scale | divided_by: 100.0 }};
+
+    --page-width: {{ settings.page_width | divided_by: 16.0 }}rem;
+    --radius-button: {{ settings.button_radius }}px;
+    --radius-input: {{ settings.input_radius }}px;
+    --radius-card: {{ settings.card_radius }}px;
+  }
+
+  {%- if settings.page_transitions -%}
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition {
+        navigation: auto;
+      }
+    }
+  {%- endif -%}
+
+  {%- liquid
+    assign scheme_selectors = ''
+    for scheme in settings.color_schemes
+      assign scheme_selectors = scheme_selectors | append: '.color-' | append: scheme.id
+      unless forloop.last
+        assign scheme_selectors = scheme_selectors | append: ', '
+      endunless
+    endfor
+  -%}
+
+  {% for scheme in settings.color_schemes %}
+    .color-{{ scheme.id }} {
+      --color-bg: {{ scheme.settings.background }};
+      --gradient-bg: {% if scheme.settings.background_gradient != empty %}{{ scheme.settings.background_gradient }}{% else %}{{ scheme.settings.background }}{% endif %};
+      --color-fg: {{ scheme.settings.text }};
+      --color-surface: {{ scheme.settings.surface }};
+      --color-border: {{ scheme.settings.border }};
+      --color-button: {{ scheme.settings.button }};
+      --color-button-fg: {{ scheme.settings.button_label }};
+      --color-secondary-fg: {{ scheme.settings.secondary_button_label }};
+    }
+  {% endfor %}
+
+  {{ scheme_selectors }} {
+    --color-muted: color-mix(in srgb, var(--color-fg) 72%, var(--color-bg));
+    --color-tint: color-mix(in srgb, var(--color-fg) 6%, var(--color-bg));
+    --color-tint-strong: color-mix(in srgb, var(--color-fg) 12%, var(--color-bg));
+    --color-input-border: color-mix(in srgb, var(--color-fg) 52%, var(--color-bg));
+    --color-button-hover: color-mix(in srgb, var(--color-button) 84%, var(--color-button-fg));
+    --color-error: color-mix(in srgb, #d42a20 70%, var(--color-fg));
+    --color-success: color-mix(in srgb, #1d8a4e 70%, var(--color-fg));
+    background: var(--gradient-bg);
+    color: var(--color-fg);
+  }
+{% endstyle %}

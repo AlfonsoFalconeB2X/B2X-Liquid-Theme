@@ -1,0 +1,195 @@
+{%- comment -%}
+  Card prodotto unica per tutte le section. L'aspetto viene da Impostazioni tema → Card prodotto.
+  Parametri:
+  - product: prodotto (se vuoto mostra un segnaposto, utile nell'editor)
+  - section_id: id della section, rende unici gli id dei form
+  - sizes: attributo sizes dell'immagine
+  - loading: 'lazy' (default) | 'eager'
+  - heading_tag: default h3
+  - placeholder_index: indice del segnaposto (senza prodotto)
+{%- endcomment -%}
+{%- liquid
+  assign tag = heading_tag | default: 'h3'
+  assign loading = loading | default: 'lazy'
+  assign sizes = sizes | default: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw'
+  assign product_title = product.title | escape
+
+  case settings.card_image_ratio
+    when 'square'
+      assign ratio = 1
+    when 'landscape'
+      assign ratio = 1.333
+    when 'natural'
+      assign ratio = product.featured_media.preview_image.aspect_ratio | default: 0.8
+    else
+      assign ratio = 0.8
+  endcase
+
+  assign secondary = nil
+  if settings.card_secondary_image and product.media.size > 1
+    assign secondary = product.media[1].preview_image
+  endif
+
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+
+  comment
+    Opzione mostrata come swatch: la prima il cui nome è nell'elenco di Impostazioni tema → Card prodotto.
+  endcomment
+  assign swatch_option = nil
+  if settings.card_swatches and product != blank and product.has_only_default_variant == false
+    assign swatch_names = settings.card_swatch_options | downcase | split: ','
+    assign name_list = '|'
+    for swatch_name in swatch_names
+      assign clean_name = swatch_name | strip
+      assign name_list = name_list | append: clean_name | append: '|'
+    endfor
+    for option in product.options_with_values
+      assign needle = option.name | downcase | strip | prepend: '|' | append: '|'
+      if name_list contains needle
+        assign swatch_option = option
+        break
+      endif
+    endfor
+  endif
+-%}
+
+<div class="card card--{{ settings.card_style }}{% if secondary %} card--has-secondary{% endif %}">
+  <div class="card__media">
+    <div class="media" style="--ratio: {{ ratio }};">
+      {%- if product.featured_media -%}
+        {{
+          product.featured_media.preview_image
+          | image_url: width: 1100
+          | image_tag:
+            widths: '220, 320, 440, 560, 720, 900, 1100',
+            sizes: sizes,
+            loading: loading,
+            class: 'card__image'
+        }}
+        {%- if secondary -%}
+          {{
+            secondary
+            | image_url: width: 1100
+            | image_tag:
+              widths: '220, 320, 440, 560, 720, 900, 1100',
+              sizes: sizes,
+              loading: 'lazy',
+              alt: '',
+              class: 'card__image card__image--secondary'
+          }}
+        {%- endif -%}
+      {%- else -%}
+        {%- liquid
+          assign placeholder_number = placeholder_index | default: 0 | modulo: 6 | plus: 1
+          assign placeholder = 'product-' | append: placeholder_number
+        -%}
+        {{ placeholder | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
+
+    {%- if product != blank -%}
+      <div class="card__badges">
+        {%- if product.available == false -%}
+          <span class="badge badge--neutral">{{ 'products.product.sold_out' | t }}</span>
+        {%- elsif on_sale and settings.card_show_sale_badge -%}
+          <span class="badge">{{ 'products.product.on_sale' | t }}</span>
+        {%- endif -%}
+      </div>
+
+      {%- if settings.card_quick_view -%}
+        <a class="icon-button card__quick-view" href="{{ product.url }}" data-quick-view aria-haspopup="dialog">
+          {%- render 'icon', name: 'search', class: 'icon--small' -%}
+          <span class="visually-hidden">{{ 'products.product.quick_view' | t }}: {{ product_title }}</span>
+        </a>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+
+  <div class="card__body">
+    {%- if settings.card_show_vendor and product.vendor != blank -%}
+      <p class="card__vendor">
+        <span class="visually-hidden">{{ 'accessibility.vendor' | t }}</span>
+        {{- product.vendor -}}
+      </p>
+    {%- endif -%}
+    <{{ tag }} class="card__title">
+      {%- if product != blank -%}
+        <a class="card__link" href="{{ product.url }}">{{ product_title }}</a>
+      {%- else -%}
+        {{ 'products.product.placeholder_title' | t }}
+      {%- endif -%}
+    </{{ tag }}>
+    {%- if product != blank -%}
+      {% render 'price', product: product, show_from: true %}
+    {%- else -%}
+      <div class="price"><span class="price__current">{{ 1999 | money }}</span></div>
+    {%- endif -%}
+
+    {%- if swatch_option -%}
+      <div class="card__swatches" role="group" aria-label="{{ swatch_option.name | escape }}">
+        {%- for value in swatch_option.values limit: 5 -%}
+          {%- liquid
+            assign value_variant = value.variant
+            assign value_image = value_variant.featured_media.preview_image
+            assign swatch_bg = ''
+            if value.swatch.image
+              assign swatch_url = value.swatch.image | image_url: width: 64
+              assign swatch_bg = 'url(' | append: swatch_url | append: ') center / cover'
+            elsif value.swatch.color
+              assign swatch_bg = value.swatch.color
+            elsif value_image
+              assign swatch_url = value_image | image_url: width: 64, height: 64, crop: 'center'
+              assign swatch_bg = 'url(' | append: swatch_url | append: ') center / cover'
+            endif
+            assign value_url = value_variant.url | default: value.product_url
+          -%}
+          <button
+            type="button"
+            class="card-swatch{% if swatch_bg == blank %} card-swatch--text{% endif %}"
+            {% if swatch_bg != blank %}style="--swatch: {{ swatch_bg }};"{% endif %}
+            data-card-swatch
+            {% if value_url != blank %}data-url="{{ value_url }}"{% endif %}
+            {% if value_image %}
+              data-src="{{ value_image | image_url: width: 720 }}"
+              data-srcset="{{ value_image | image_url: width: 360 }} 360w, {{ value_image | image_url: width: 560 }} 560w, {{ value_image | image_url: width: 720 }} 720w, {{ value_image | image_url: width: 1100 }} 1100w"
+            {% endif %}
+            aria-pressed="{{ value.selected }}"
+            {% unless value.available %}data-unavailable{% endunless %}
+          >
+            <span class="{% if swatch_bg != blank %}visually-hidden{% endif %}">{{ value | escape }}</span>
+          </button>
+        {%- endfor -%}
+        {%- if swatch_option.values.size > 5 -%}
+          {%- assign more = swatch_option.values.size | minus: 5 -%}
+          <span class="card-swatch__more">{{ 'products.product.more_options' | t: count: more }}</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if settings.card_quick_add and product != blank and product.available -%}
+    <div class="card__footer">
+      {%- if product.has_only_default_variant -%}
+        {%- assign form_id = 'CardForm-' | append: section_id | append: '-' | append: product.id -%}
+        <product-form>
+          {%- form 'product', product, id: form_id, novalidate: 'novalidate' -%}
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            <button type="submit" name="add" class="button button--secondary button--small button--full">
+              {{- 'products.product.add_to_cart' | t -}}
+              <span class="visually-hidden">: {{ product_title }}</span>
+            </button>
+            <p class="form-message form-message--error" role="alert" data-form-error hidden></p>
+          {%- endform -%}
+        </product-form>
+      {%- else -%}
+        <a class="button button--secondary button--small button--full" href="{{ product.url }}" data-quick-view aria-haspopup="dialog">
+          {{- 'products.product.choose_options' | t -}}
+          <span class="visually-hidden">: {{ product_title }}</span>
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</div>

@@ -1,0 +1,54 @@
+{%- liquid
+  assign classes = 'button'
+  case block.settings.style
+    when 'secondary'
+      assign classes = 'button button--secondary'
+    when 'link'
+      assign classes = 'link'
+  endcase
+  if block.settings.size == 'large' and block.settings.style != 'link'
+    assign classes = classes | append: ' button--large'
+  endif
+-%}
+{%- if block.settings.label != blank and block.settings.link != blank -%}
+  <a class="block-button {{ classes }}" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>
+    {{- block.settings.label | escape -}}
+    {%- if block.settings.style == 'link' -%}{% render 'icon', name: 'arrow-right', class: 'icon--small' %}{%- endif -%}
+  </a>
+{%- elsif request.design_mode -%}
+  <span class="block-button {{ classes }}" aria-disabled="true" {{ block.shopify_attributes }}>
+    {{- block.settings.label | default: 'Pulsante' | escape -}}
+  </span>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Pulsante",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Etichetta", "default": "Scopri di più" },
+    { "type": "url", "id": "link", "label": "Link", "info": "Senza link il pulsante non viene mostrato nel negozio." },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Stile",
+      "options": [
+        { "value": "primary", "label": "Pieno" },
+        { "value": "secondary", "label": "Contorno" },
+        { "value": "link", "label": "Link con freccia" }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Dimensione",
+      "options": [
+        { "value": "default", "label": "Normale" },
+        { "value": "large", "label": "Grande" }
+      ],
+      "default": "default"
+    }
+  ],
+  "presets": [{ "name": "Pulsante" }]
+}
+{% endschema %}

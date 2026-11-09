@@ -1,0 +1,71 @@
+{{ 'cart.css' | asset_url | stylesheet_tag }}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width" data-cart-section="{{ section.id }}">
+    {%- if cart.empty? -%}
+      <div class="empty-state">
+        <span class="empty-state__icon">{% render 'icon', name: 'bag' %}</span>
+        <h1 class="h2" tabindex="-1" data-cart-focus-fallback>{{ 'cart.empty' | t }}</h1>
+        <p class="text-muted">{{ 'cart.empty_text' | t }}</p>
+        <a class="button" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue_shopping' | t }}</a>
+        {%- if shop.customer_accounts_enabled and customer == null -%}
+          <p class="text-small text-muted">
+            {{ 'cart.login_html' | t: link: routes.account_login_url }}
+          </p>
+        {%- endif -%}
+      </div>
+    {%- else -%}
+      {%- assign form_id = 'CartForm-' | append: section.id -%}
+      <div class="page-header">
+        <h1 tabindex="-1" data-cart-focus-fallback>{{ 'cart.title' | t }}</h1>
+        <a class="link" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue_shopping' | t }}</a>
+      </div>
+
+      <div class="cart-page">
+        <div class="cart-page__items">
+          {% render 'cart-free-shipping' %}
+          <form action="{{ routes.cart_url }}" method="post" id="{{ form_id }}">
+            {% render 'cart-lines', context: 'page' %}
+            <div class="cart-page__update no-js-only">
+              <button type="submit" name="update" class="button button--secondary button--small">{{ 'cart.update' | t }}</button>
+            </div>
+          </form>
+        </div>
+
+        <aside class="cart-page__summary" aria-label="{{ 'cart.summary' | t }}">
+          {% render 'cart-note', context: 'page', show_note: section.settings.show_note, form_id: form_id %}
+          {% render 'cart-discount', context: 'page' %}
+          {% render 'cart-totals' %}
+
+          <button type="submit" name="checkout" form="{{ form_id }}" class="button button--large button--full">
+            {%- render 'icon', name: 'lock', class: 'icon--small' -%}
+            {{ 'cart.checkout' | t }}
+          </button>
+
+          {%- if additional_checkout_buttons and section.settings.show_dynamic_checkout -%}
+            <div class="cart-page__dynamic">{{ content_for_additional_checkout_buttons }}</div>
+          {%- endif -%}
+        </aside>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Carrello",
+  "class": "section-main-cart",
+  "settings": [
+    { "type": "checkbox", "id": "show_note", "label": "Mostra nota dell'ordine", "default": false },
+    { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Mostra pulsanti di pagamento rapido", "default": true },
+    {
+      "type": "paragraph",
+      "content": "Codici sconto, spedizione gratuita e attributi dell'ordine si impostano in Impostazioni tema → Carrello."
+    },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    { "type": "header", "content": "Spaziatura" },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 }
+  ]
+}
+{% endschema %}

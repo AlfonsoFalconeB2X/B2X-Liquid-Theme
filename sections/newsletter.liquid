@@ -1,0 +1,75 @@
+{%- assign s = section.settings -%}
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    <div class="newsletter newsletter--{{ s.layout }}">
+      <div class="newsletter__text">
+        {%- if s.kicker != blank -%}
+          <p class="kicker">{{ s.kicker | escape }}</p>
+        {%- endif -%}
+        {%- if s.heading != blank -%}
+          <h2 class="h2">{{ s.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if s.text != blank -%}
+          <div class="rte text-muted">{{ s.text }}</div>
+        {%- endif -%}
+      </div>
+      <div>
+        {%- assign form_id = 'Newsletter-' | append: section.id -%}
+        {% render 'newsletter-form', form_id: form_id, button_label: s.button_label %}
+        {%- if s.disclaimer != blank -%}
+          <div class="rte text-small text-muted newsletter__disclaimer">{{ s.disclaimer }}</div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "class": "section-newsletter",
+  "disabled_on": { "groups": ["header"] },
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Etichetta" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Restiamo in contatto" },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Testo",
+      "default": "<p>Iscriviti per ricevere novità, consigli e offerte riservate.</p>"
+    },
+    { "type": "text", "id": "button_label", "label": "Etichetta pulsante", "default": "Iscriviti" },
+    {
+      "type": "richtext",
+      "id": "disclaimer",
+      "label": "Nota sotto il form",
+      "default": "<p>Puoi annullare l'iscrizione in qualsiasi momento.</p>"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Disposizione",
+      "options": [
+        { "value": "center", "label": "Centrata" },
+        { "value": "inline", "label": "Testo e form affiancati" }
+      ],
+      "default": "inline"
+    },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-3" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "boxed"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "presets": [{ "name": "Newsletter" }]
+}
+{% endschema %}

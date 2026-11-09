@@ -1,0 +1,71 @@
+<div
+  class="block-group block-group--{{ block.settings.layout }} block-group--{{ block.settings.style }}"
+  style="--group-gap: {{ block.settings.gap }}px; --group-align: {{ block.settings.align }}; --group-columns: {{ block.settings.columns }};"
+  {{ block.shopify_attributes }}
+>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "Gruppo",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Disposizione",
+      "options": [
+        { "value": "stack", "label": "In colonna" },
+        { "value": "row", "label": "In riga" },
+        { "value": "grid", "label": "Griglia" }
+      ],
+      "default": "stack"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Colonne della griglia (desktop)",
+      "info": "Solo con la disposizione Griglia. Su mobile è sempre una colonna.",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Allineamento",
+      "options": [
+        { "value": "start", "label": "Inizio" },
+        { "value": "center", "label": "Centro" },
+        { "value": "end", "label": "Fine" }
+      ],
+      "default": "start"
+    },
+    { "type": "range", "id": "gap", "label": "Spazio interno tra i blocchi", "min": 0, "max": 64, "step": 4, "unit": "px", "default": 16 },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Stile",
+      "options": [
+        { "value": "plain", "label": "Senza sfondo" },
+        { "value": "surface", "label": "Su superficie" },
+        { "value": "tint", "label": "Tinta leggera" }
+      ],
+      "default": "plain"
+    }
+  ],
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "presets": [
+    {
+      "name": "Gruppo",
+      "blocks": [{ "type": "heading", "settings": { "size": "h3", "tag": "h3" } }, { "type": "text" }]
+    },
+    {
+      "name": "Due colonne",
+      "settings": { "layout": "grid", "columns": 2, "gap": 32 },
+      "blocks": [{ "type": "image" }, { "type": "text" }]
+    }
+  ]
+}
+{% endschema %}

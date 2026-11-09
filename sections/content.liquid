@@ -1,0 +1,60 @@
+{%- assign s = section.settings -%}
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width{% if s.width == 'narrow' %} page-width--narrow{% endif %}">
+    <div class="content-flow content-flow--{{ s.align }} reveal" style="--flow-gap: {{ s.gap }}px;">
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contenuto",
+  "class": "section-content",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Larghezza",
+      "options": [
+        { "value": "page", "label": "Pagina" },
+        { "value": "narrow", "label": "Stretta" }
+      ],
+      "default": "narrow"
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Allineamento",
+      "options": [
+        { "value": "start", "label": "Sinistra" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "center"
+    },
+    { "type": "range", "id": "gap", "label": "Spazio tra i blocchi", "min": 0, "max": 64, "step": 4, "unit": "px", "default": 20 },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "full"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [{ "type": "@theme" }, { "type": "@app" }],
+  "presets": [
+    {
+      "name": "Contenuto",
+      "blocks": [{ "type": "heading" }, { "type": "text" }, { "type": "button" }]
+    }
+  ]
+}
+{% endschema %}

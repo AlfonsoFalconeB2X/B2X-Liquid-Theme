@@ -1,0 +1,180 @@
+{%- liquid
+  assign s = section.settings
+  case s.image_ratio
+    when 'square'
+      assign ratio = 1
+    when 'landscape'
+      assign ratio = 1.333
+    when 'natural'
+      assign ratio = s.image.aspect_ratio | default: 1
+    else
+      assign ratio = 0.8
+  endcase
+  assign half_page = settings.page_width | divided_by: 2
+  assign sizes = '(min-width: 750px) ' | append: half_page | append: 'px, 100vw'
+-%}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    <div class="split{% if s.media_position == 'right' %} split--media-right{% endif %}">
+      <div class="split__media reveal">
+        <div class="media" style="--ratio: {{ ratio }};">
+          {%- if s.image != blank -%}
+            {{
+              s.image
+              | image_url: width: 1800
+              | image_tag: widths: '480, 750, 1000, 1300, 1600, 1800', sizes: sizes, loading: 'lazy'
+            }}
+          {%- else -%}
+            {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="split__content reveal">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'kicker' -%}
+              <p class="kicker" {{ block.shopify_attributes }}>{{ block.settings.text | escape }}</p>
+            {%- when 'heading' -%}
+              <h2 class="h2" {{ block.shopify_attributes }}>{{ block.settings.heading | escape }}</h2>
+            {%- when 'text' -%}
+              <div class="rte text-muted" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+            {%- when 'checklist' -%}
+              <ul class="check-list" role="list" {{ block.shopify_attributes }}>
+                {%- assign items = block.settings.items | newline_to_br | split: '<br />' -%}
+                {%- for item in items -%}
+                  {%- assign item_text = item | strip -%}
+                  {%- if item_text != blank -%}
+                    <li>{% render 'icon', name: 'check', class: 'icon--small' %}<span>{{ item_text | escape }}</span></li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- when 'button' -%}
+              {%- if block.settings.label != blank and block.settings.link != blank -%}
+                <a
+                  class="button{% if block.settings.style == 'secondary' %} button--secondary{% endif %}"
+                  href="{{ block.settings.link }}"
+                  {{ block.shopify_attributes }}
+                >
+                  {{- block.settings.label | escape -}}
+                </a>
+              {%- endif -%}
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Immagine con testo",
+  "class": "section-image-with-text",
+  "max_blocks": 8,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Immagine" },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporzioni immagine",
+      "options": [
+        { "value": "portrait", "label": "Verticale" },
+        { "value": "square", "label": "Quadrata" },
+        { "value": "landscape", "label": "Orizzontale" },
+        { "value": "natural", "label": "Originale" }
+      ],
+      "default": "portrait"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Posizione immagine",
+      "options": [
+        { "value": "left", "label": "Sinistra" },
+        { "value": "right", "label": "Destra" }
+      ],
+      "default": "left"
+    },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-3" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "boxed"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "kicker",
+      "name": "Etichetta",
+      "limit": 1,
+      "settings": [{ "type": "text", "id": "text", "label": "Testo", "default": "La nostra storia" }]
+    },
+    {
+      "type": "heading",
+      "name": "Titolo",
+      "limit": 1,
+      "settings": [{ "type": "text", "id": "heading", "label": "Titolo", "default": "Fatto bene, fatto per durare" }]
+    },
+    {
+      "type": "text",
+      "name": "Testo",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Testo",
+          "default": "<p>Racconta cosa rende speciali i tuoi prodotti: materiali, provenienza, cura nei dettagli.</p>"
+        }
+      ]
+    },
+    {
+      "type": "checklist",
+      "name": "Elenco di punti",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "items",
+          "label": "Punti",
+          "info": "Uno per riga.",
+          "default": "Materiali selezionati\nSpedizione in 24/48 ore\nReso gratuito entro 30 giorni"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Pulsante",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Etichetta", "default": "Scopri di più" },
+        { "type": "url", "id": "link", "label": "Link" },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Stile",
+          "options": [
+            { "value": "primary", "label": "Pieno" },
+            { "value": "secondary", "label": "Contorno" }
+          ],
+          "default": "primary"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Immagine con testo",
+      "blocks": [{ "type": "kicker" }, { "type": "heading" }, { "type": "text" }, { "type": "checklist" }, { "type": "button" }]
+    }
+  ]
+}
+{% endschema %}

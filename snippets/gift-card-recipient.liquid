@@ -1,0 +1,39 @@
+{%- comment -%}
+  Invio del buono regalo a un destinatario (proprietà riservate di Shopify), dentro il form del prodotto.
+  I campi compaiono solo con la casella spuntata; assets/product.js li disattiva quando la casella è vuota.
+  Parametro: section_id
+{%- endcomment -%}
+{%- liquid
+  assign prefix = 'Recipient-' | append: section_id
+  assign today = 'now' | date: '%Y-%m-%d'
+  assign max_seconds = 'now' | date: '%s' | plus: 7776000
+  assign max_date = max_seconds | date: '%Y-%m-%d'
+-%}
+<gift-card-recipient class="recipient">
+  <label class="checkbox" for="{{ prefix }}-toggle">
+    <input type="checkbox" id="{{ prefix }}-toggle" name="properties[__shopify_send_gift_card_to_recipient]" data-preserve>
+    <span>{{ 'products.product.recipient.toggle' | t }}</span>
+  </label>
+
+  <div class="recipient__fields">
+    <div class="field">
+      <label class="field__label" for="{{ prefix }}-email">{{ 'products.product.recipient.email' | t }} <span aria-hidden="true">*</span></label>
+      <input class="input" id="{{ prefix }}-email" type="email" name="properties[Recipient email]" autocomplete="off" spellcheck="false" data-recipient-field data-preserve>
+    </div>
+    <div class="field">
+      <label class="field__label" for="{{ prefix }}-name">{{ 'products.product.recipient.name' | t }}</label>
+      <input class="input" id="{{ prefix }}-name" type="text" name="properties[Recipient name]" autocomplete="off" data-recipient-field data-preserve>
+    </div>
+    <div class="field">
+      <label class="field__label" for="{{ prefix }}-message">{{ 'products.product.recipient.message' | t }}</label>
+      <textarea class="textarea" id="{{ prefix }}-message" name="properties[Message]" rows="3" maxlength="200" data-recipient-field data-preserve></textarea>
+      <p class="text-small text-muted">{{ 'products.product.recipient.message_hint' | t }}</p>
+    </div>
+    <div class="field">
+      <label class="field__label" for="{{ prefix }}-date">{{ 'products.product.recipient.send_on' | t }}</label>
+      <input class="input" id="{{ prefix }}-date" type="date" name="properties[Send on]" min="{{ today }}" max="{{ max_date }}" data-recipient-field data-preserve>
+      <p class="text-small text-muted">{{ 'products.product.recipient.send_on_hint' | t }}</p>
+    </div>
+    <input type="hidden" name="properties[__shopify_offset]" value="" data-recipient-offset data-recipient-field>
+  </div>
+</gift-card-recipient>

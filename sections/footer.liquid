@@ -1,0 +1,192 @@
+{%- liquid
+  assign has_social = false
+  assign networks = 'instagram,facebook,tiktok,youtube,linkedin,pinterest,x'
+  assign network_list = networks | split: ','
+  for network in network_list
+    assign setting_id = 'social_' | append: network
+    if settings[setting_id] != blank
+      assign has_social = true
+    endif
+  endfor
+-%}
+
+<footer {% render 'section-attributes', section: section, class: 'footer' %}>
+  <div class="section__inner page-width">
+    {%- if section.blocks.size > 0 -%}
+      <div class="footer__grid">
+        {%- for block in section.blocks -%}
+          <div class="footer-block footer-block--{{ block.type }}" {{ block.shopify_attributes }}>
+            {%- case block.type -%}
+              {%- when 'brand' -%}
+                {%- if block.settings.logo != blank -%}
+                  {%- assign brand_width_2x = block.settings.logo_width | times: 2 -%}
+                  <span class="footer-block__logo" style="--logo-width: {{ block.settings.logo_width }}px;">
+                    {{- block.settings.logo | image_url: width: brand_width_2x | image_tag: alt: shop.name, loading: 'lazy' -}}
+                  </span>
+                {%- else -%}
+                  <p class="footer-block__brand">{{ shop.name }}</p>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <div class="rte footer-block__text">{{ block.settings.text }}</div>
+                {%- endif -%}
+                {%- if block.settings.show_social and has_social -%}
+                  <ul class="social-links" role="list">
+                    {%- for network in network_list -%}
+                      {%- assign setting_id = 'social_' | append: network -%}
+                      {%- if settings[setting_id] != blank -%}
+                        <li>
+                          <a href="{{ settings[setting_id] }}" target="_blank" rel="noopener">
+                            {%- case network -%}
+                              {%- when 'instagram' -%}Instagram
+                              {%- when 'facebook' -%}Facebook
+                              {%- when 'tiktok' -%}TikTok
+                              {%- when 'youtube' -%}YouTube
+                              {%- when 'linkedin' -%}LinkedIn
+                              {%- when 'pinterest' -%}Pinterest
+                              {%- when 'x' -%}X
+                            {%- endcase -%}
+                            <span class="visually-hidden"> {{ 'accessibility.new_window' | t }}</span>
+                          </a>
+                        </li>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+
+              {%- when 'menu' -%}
+                {%- if block.settings.heading != blank -%}
+                  <h2 class="footer-block__title">{{ block.settings.heading | escape }}</h2>
+                {%- endif -%}
+                {%- if block.settings.menu != blank -%}
+                  <ul class="footer-menu" role="list">
+                    {%- for link in block.settings.menu.links -%}
+                      <li>
+                        <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+
+              {%- when 'text' -%}
+                {%- if block.settings.heading != blank -%}
+                  <h2 class="footer-block__title">{{ block.settings.heading | escape }}</h2>
+                {%- endif -%}
+                <div class="rte footer-block__text">{{ block.settings.text }}</div>
+
+              {%- when 'newsletter' -%}
+                {%- if block.settings.heading != blank -%}
+                  <h2 class="footer-block__title">{{ block.settings.heading | escape }}</h2>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <div class="rte footer-block__text">{{ block.settings.text }}</div>
+                {%- endif -%}
+                {%- assign form_id = 'FooterNewsletter-' | append: block.id -%}
+                {% render 'newsletter-form', form_id: form_id %}
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="footer__bottom">
+      <div class="footer__legal">
+        <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: routes.root_url }}</p>
+        {%- if section.settings.show_policies and shop.policies.size > 0 -%}
+          <ul class="footer__policies" role="list">
+            {%- for policy in shop.policies -%}
+              {%- if policy != blank -%}
+                <li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_localization -%}
+        {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
+          {% render 'localization-form' %}
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+        <ul class="payment-icons" role="list" aria-label="{{ 'sections.footer.payment_methods' | t }}">
+          {%- for type in shop.enabled_payment_types -%}
+            <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "max_blocks": 6,
+  "enabled_on": { "groups": ["footer"] },
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-2" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "boxed"
+    },
+    { "type": "checkbox", "id": "show_policies", "label": "Mostra link alle policy", "default": true },
+    { "type": "checkbox", "id": "show_localization", "label": "Mostra selettori paese e lingua", "default": true },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Mostra metodi di pagamento", "default": true },
+    { "type": "header", "content": "Spaziatura" },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 32 }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Marchio",
+      "limit": 1,
+      "settings": [
+        { "type": "image_picker", "id": "logo", "label": "Logo" },
+        { "type": "range", "id": "logo_width", "label": "Larghezza logo", "min": 60, "max": 240, "step": 4, "unit": "px", "default": 120 },
+        { "type": "richtext", "id": "text", "label": "Testo", "default": "<p>Prodotti scelti con cura, spediti con attenzione.</p>" },
+        {
+          "type": "checkbox",
+          "id": "show_social",
+          "label": "Mostra link social",
+          "info": "Imposta i link in Impostazioni tema → Social.",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Titolo", "default": "Link utili" },
+        { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Testo",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Titolo", "default": "Contatti" },
+        { "type": "richtext", "id": "text", "label": "Testo", "default": "<p>Scrivici per qualsiasi domanda: rispondiamo entro un giorno lavorativo.</p>" }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Titolo", "default": "Newsletter" },
+        { "type": "richtext", "id": "text", "label": "Testo", "default": "<p>Novità e offerte, non più di una volta al mese.</p>" }
+      ]
+    }
+  ]
+}
+{% endschema %}

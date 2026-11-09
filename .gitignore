@@ -1,0 +1,13 @@
+# Shopify CLI
+.shopify/
+.shopify-cli.json
+
+# Sistema ed editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Ambiente
+.env
+.env.local

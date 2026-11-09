@@ -1,0 +1,165 @@
+{%- comment -%}
+  Pannello filtri condiviso da collezione e ricerca (filtri di Search & Discovery).
+  È un popover: su mobile (e con la disposizione "cassetto") si apre come pannello laterale,
+  da 990px con la disposizione "barra laterale" resta visibile accanto ai risultati (collection.css).
+  Senza JS il form si invia con il pulsante "Applica".
+
+  Parametri:
+  - results: collection o search
+  - section_id
+  - results_url: URL base dei risultati (per "Rimuovi tutti")
+  - terms: termini di ricerca (solo per la ricerca)
+{%- endcomment -%}
+{%- liquid
+  assign currencies_using_comma_decimals = 'ANG,ARS,BRL,BYN,BYR,CLF,CLP,COP,CRC,CZK,DKK,EUR,HRK,HUF,IDR,ISK,MZN,NOK,PLN,RON,RUB,SEK,TRY,UYU,VES,VND' | split: ','
+  assign uses_comma_decimals = false
+  if currencies_using_comma_decimals contains cart.currency.iso_code
+    assign uses_comma_decimals = true
+  endif
+
+  assign form_id = 'FacetsForm-' | append: section_id
+  if results.products_count
+    assign result_count = results.products_count
+  else
+    assign result_count = results.results_count
+  endif
+-%}
+
+<div id="Facets-{{ section_id }}" class="facets drawer drawer--left" popover>
+  <div class="drawer__header facets__header">
+    <p class="drawer__title">{{ 'collections.filters.title' | t }}</p>
+    <button type="button" class="icon-button" popovertarget="Facets-{{ section_id }}" popovertargetaction="hide" aria-label="{{ 'general.close' | t }}">
+      {%- render 'icon', name: 'close' -%}
+    </button>
+  </div>
+
+  <form id="{{ form_id }}" class="facets__form drawer__body" action="{{ results_url }}" method="get" data-facets-form data-facets-part="filters">
+    {%- if terms != blank -%}
+      <input type="hidden" name="q" value="{{ terms | escape }}">
+      <input type="hidden" name="options[prefix]" value="last">
+    {%- endif -%}
+
+    {%- for filter in results.filters -%}
+      {%- liquid
+        assign active_count = filter.active_values.size
+        if filter.type == 'price_range'
+          if filter.min_value.value != null or filter.max_value.value != null
+            assign active_count = 1
+          endif
+        endif
+      -%}
+      <details class="facet" data-facet="{{ filter.param_name | escape }}"{% if active_count > 0 or forloop.index <= 2 %} open{% endif %}>
+        <summary class="facet__summary">
+          <span>
+            {{- filter.label | escape -}}
+            {%- if active_count > 0 %} <span class="facet__active-count">({{ active_count }})</span>{% endif -%}
+          </span>
+          {%- render 'icon', name: 'chevron-down', class: 'icon--small' -%}
+        </summary>
+
+        {%- case filter.type -%}
+          {%- when 'price_range' -%}
+            {%- liquid
+              assign min_value = ''
+              assign max_value = ''
+              if filter.min_value.value
+                if uses_comma_decimals
+                  assign min_value = filter.min_value.value | money_without_currency | replace: '.', '' | replace: ',', '.'
+                else
+                  assign min_value = filter.min_value.value | money_without_currency | replace: ',', ''
+                endif
+              endif
+              if filter.max_value.value
+                if uses_comma_decimals
+                  assign max_value = filter.max_value.value | money_without_currency | replace: '.', '' | replace: ',', '.'
+                else
+                  assign max_value = filter.max_value.value | money_without_currency | replace: ',', ''
+                endif
+              endif
+              if uses_comma_decimals
+                assign range_max = filter.range_max | money_without_currency | replace: '.', '' | replace: ',', '.'
+              else
+                assign range_max = filter.range_max | money_without_currency | replace: ',', ''
+              endif
+            -%}
+            <div class="facet__price">
+              <div class="field">
+                <label class="field__label" for="{{ form_id }}-price-min">{{ 'collections.filters.from' | t }} ({{ cart.currency.symbol }})</label>
+                <input
+                  class="input"
+                  id="{{ form_id }}-price-min"
+                  type="number"
+                  inputmode="decimal"
+                  name="{{ filter.min_value.param_name }}"
+                  value="{{ min_value }}"
+                  min="0"
+                  max="{{ range_max }}"
+                  placeholder="0"
+                  data-price-input
+                >
+              </div>
+              <div class="field">
+                <label class="field__label" for="{{ form_id }}-price-max">{{ 'collections.filters.to' | t }} ({{ cart.currency.symbol }})</label>
+                <input
+                  class="input"
+                  id="{{ form_id }}-price-max"
+                  type="number"
+                  inputmode="decimal"
+                  name="{{ filter.max_value.param_name }}"
+                  value="{{ max_value }}"
+                  min="0"
+                  max="{{ range_max }}"
+                  placeholder="{{ range_max }}"
+                  data-price-input
+                >
+              </div>
+            </div>
+
+          {%- else -%}
+            <ul class="facet__list" role="list">
+              {%- for value in filter.values -%}
+                {%- assign input_id = form_id | append: '-' | append: filter.param_name | handleize | append: '-' | append: forloop.index -%}
+                <li>
+                  <label class="checkbox facet__option{% if value.count == 0 and value.active == false %} is-disabled{% endif %}" for="{{ input_id }}">
+                    <input
+                      type="checkbox"
+                      id="{{ input_id }}"
+                      name="{{ value.param_name }}"
+                      value="{{ value.value }}"
+                      {% if value.active %}checked{% endif %}
+                      {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                    >
+                    <span class="facet__label">
+                      {%- if value.swatch.color or value.swatch.image -%}
+                        {%- liquid
+                          if value.swatch.image
+                            assign swatch_url = value.swatch.image | image_url: width: 48
+                            assign swatch_bg = 'url(' | append: swatch_url | append: ') center / cover'
+                          else
+                            assign swatch_bg = value.swatch.color
+                          endif
+                        -%}
+                        <span class="facet__swatch" style="--swatch: {{ swatch_bg }};" aria-hidden="true"></span>
+                      {%- endif -%}
+                      {{- value.label | escape -}}
+                      <span class="facet__count">({{ value.count }})</span>
+                    </span>
+                  </label>
+                </li>
+              {%- endfor -%}
+            </ul>
+        {%- endcase -%}
+      </details>
+    {%- endfor -%}
+
+    <div class="facets__apply no-js-only">
+      <button type="submit" class="button button--full">{{ 'collections.filters.apply' | t }}</button>
+    </div>
+  </form>
+
+  <div class="drawer__footer facets__footer" data-facets-part="drawer-footer">
+    <button type="button" class="button button--full" popovertarget="Facets-{{ section_id }}" popovertargetaction="hide">
+      {{- 'collections.filters.show_results' | t: count: result_count -}}
+    </button>
+  </div>
+</div>

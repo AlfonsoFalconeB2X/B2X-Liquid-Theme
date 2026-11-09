@@ -1,0 +1,47 @@
+{%- comment -%}
+  Form di acquisto (pagina prodotto e anteprima rapida): opzioni di abbonamento, destinatario del buono regalo,
+  pulsante "Aggiungi al carrello" e pagamento rapido.
+  Parametri: product, variant, can_buy, combination_exists, section_id, form_id, show_dynamic_checkout,
+  show_gift_card_recipient, attributes (block.shopify_attributes)
+{%- endcomment -%}
+<div class="product__buy" data-product-part="buy-buttons" {{ attributes }}>
+  <product-form>
+    {%- form 'product', product, id: form_id, novalidate: 'novalidate', class: 'product__form' -%}
+      <input type="hidden" name="id" value="{{ variant.id }}"{% unless can_buy %} disabled{% endunless %}>
+
+      {% render 'product-selling-plans', product: product, variant: variant, section_id: section_id %}
+
+      {%- if show_gift_card_recipient and product.gift_card? -%}
+        {% render 'gift-card-recipient', section_id: section_id %}
+      {%- endif -%}
+
+      <button type="submit" name="add" class="button button--large button--full"{% unless can_buy %} disabled{% endunless %}>
+        {%- if can_buy -%}
+          {{ 'products.product.add_to_cart' | t }}
+        {%- elsif combination_exists -%}
+          {{ 'products.product.sold_out' | t }}
+        {%- else -%}
+          {{ 'products.product.unavailable' | t }}
+        {%- endif -%}
+      </button>
+      {%- if show_dynamic_checkout and can_buy -%}
+        {{ form | payment_button }}
+      {%- endif -%}
+      <p class="form-message form-message--error" role="alert" data-form-error hidden></p>
+    {%- endform -%}
+  </product-form>
+</div>
+{%- unless product.has_only_default_variant -%}
+  <noscript>
+    <div class="field">
+      <label class="field__label" for="NoJsVariant-{{ section_id }}">{{ 'products.product.choose_options' | t }}</label>
+      <select class="select" id="NoJsVariant-{{ section_id }}" name="id" form="{{ form_id }}">
+        {%- for item in product.variants -%}
+          <option value="{{ item.id }}"{% if item.id == variant.id %} selected{% endif %}{% unless item.available %} disabled{% endunless %}>
+            {{- item.title | escape }} — {{ item.price | money -}}
+          </option>
+        {%- endfor -%}
+      </select>
+    </div>
+  </noscript>
+{%- endunless -%}

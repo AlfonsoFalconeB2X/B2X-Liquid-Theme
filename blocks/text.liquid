@@ -1,0 +1,30 @@
+<div class="block-text rte{% if block.settings.size == 'lead' %} text-lead{% elsif block.settings.size == 'small' %} text-small{% endif %}{% if block.settings.muted %} text-muted{% endif %}" {{ block.shopify_attributes }}>
+  {{- block.settings.text -}}
+</div>
+
+{% schema %}
+{
+  "name": "Testo",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Testo",
+      "default": "<p>Racconta qualcosa ai tuoi clienti: un valore del marchio, una novità, un consiglio.</p>"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Dimensione",
+      "options": [
+        { "value": "small", "label": "Piccola" },
+        { "value": "body", "label": "Normale" },
+        { "value": "lead", "label": "Grande" }
+      ],
+      "default": "body"
+    },
+    { "type": "checkbox", "id": "muted", "label": "Colore attenuato", "default": true }
+  ],
+  "presets": [{ "name": "Testo" }]
+}
+{% endschema %}

@@ -1,0 +1,46 @@
+{%- comment -%}
+  Card articolo. Parametri: article (se vuoto mostra un segnaposto), sizes, loading, show_excerpt, show_date, heading_tag (default h3)
+{%- endcomment -%}
+{%- liquid
+  assign tag = heading_tag | default: 'h3'
+  assign sizes = sizes | default: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
+  assign loading = loading | default: 'lazy'
+-%}
+<article class="article-card">
+  <div class="media" style="--ratio: 1.5;">
+    {%- if article.image -%}
+      {{
+        article.image
+        | image_url: width: 1200
+        | image_tag:
+          widths: '320, 480, 640, 800, 1000, 1200',
+          sizes: sizes,
+          loading: loading,
+          alt: ''
+      }}
+    {%- else -%}
+      {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+  <div class="article-card__body">
+    {%- if show_date and article != blank -%}
+      <p class="article-card__meta">{{ article.published_at | time_tag: format: 'date' }}</p>
+    {%- endif -%}
+    <{{ tag }} class="article-card__title">
+      {%- if article != blank -%}
+        <a class="card__link" href="{{ article.url }}">{{ article.title | escape }}</a>
+      {%- else -%}
+        {{ 'blogs.article.placeholder_title' | t }}
+      {%- endif -%}
+    </{{ tag }}>
+    {%- if show_excerpt and article != blank -%}
+      <p class="article-card__excerpt">
+        {%- if article.excerpt != blank -%}
+          {{ article.excerpt | strip_html | truncatewords: 24 }}
+        {%- else -%}
+          {{ article.content | strip_html | truncatewords: 24 }}
+        {%- endif -%}
+      </p>
+    {%- endif -%}
+  </div>
+</article>

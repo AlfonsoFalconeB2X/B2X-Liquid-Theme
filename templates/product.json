@@ -1,0 +1,47 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": { "type": "title", "settings": { "show_vendor": false } },
+        "price": { "type": "price", "settings": {} },
+        "variant_picker": { "type": "variant_picker", "settings": { "style": "buttons", "swatches": true } },
+        "inventory": { "type": "inventory", "settings": { "low_stock_threshold": 5 } },
+        "quantity": { "type": "quantity", "settings": {} },
+        "buy_buttons": { "type": "buy_buttons", "settings": { "show_dynamic_checkout": true } },
+        "text": { "type": "text", "settings": { "text": "<p>Spedizione gratuita sopra i 60 €.</p>", "style": "muted" } },
+        "description": { "type": "description", "settings": {} },
+        "shipping": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Spedizioni e resi",
+            "content": "<p>Spedizione in 24/48 ore. Reso gratuito entro 30 giorni.</p>",
+            "open": false
+          }
+        }
+      },
+      "block_order": ["title", "price", "variant_picker", "inventory", "quantity", "buy_buttons", "text", "description", "shipping"],
+      "settings": {
+        "media_layout": "grid",
+        "media_ratio": "portrait",
+        "color_scheme": "scheme-1",
+        "padding_top": 32,
+        "padding_bottom": 64
+      }
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "Potrebbe piacerti anche",
+        "intent": "related",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "color_scheme": "scheme-1",
+        "section_style": "full",
+        "padding_top": 48,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": ["main", "recommendations"]
+}

@@ -1,0 +1,178 @@
+{{ 'collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'collection.js' | asset_url }}" type="module"></script>
+
+{%- liquid
+  assign s = section.settings
+  assign columns = s.columns_desktop
+  assign columns_tablet = columns | at_most: 3
+  assign show_filters = false
+  if s.enable_filtering and collection.filters.size > 0
+    assign show_filters = true
+  endif
+  assign layout = 'drawer'
+  if show_filters and s.filter_layout == 'sidebar'
+    assign layout = 'sidebar'
+  endif
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+
+  assign grid_width = settings.page_width
+  if layout == 'sidebar'
+    assign grid_width = grid_width | minus: 288
+  endif
+  assign column_width = grid_width | divided_by: columns
+  assign sizes = '(min-width: 990px) ' | append: column_width | append: 'px, (min-width: 750px) 33vw, 50vw'
+
+  assign active_count = 0
+  for filter in collection.filters
+    assign active_count = active_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != null or filter.max_value.value != null
+        assign active_count = active_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    <header class="collection-hero{% if s.show_image and collection.image %} collection-hero--image{% endif %}">
+      <div class="collection-hero__text">
+        <h1>{{ collection.title | escape }}</h1>
+        {%- if s.show_description and collection.description != blank -%}
+          <div class="rte text-muted collection-hero__description">{{ collection.description }}</div>
+        {%- endif -%}
+      </div>
+      {%- if s.show_image and collection.image -%}
+        <div class="media collection-hero__media" style="--ratio: 2;">
+          {{ collection.image | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 50vw, 100vw', loading: 'eager', fetchpriority: 'high' }}
+        </div>
+      {%- endif -%}
+    </header>
+
+    {%- paginate collection.products by s.products_per_page -%}
+      <facets-form class="collection-layout collection-layout--{{ layout }}" data-section="{{ section.id }}">
+        <div class="toolbar">
+          {%- if show_filters -%}
+            <button type="button" class="button button--secondary button--small toolbar__filters" popovertarget="Facets-{{ section.id }}">
+              {%- render 'icon', name: 'filter', class: 'icon--small' -%}
+              {{ 'collections.filters.title' | t }}
+              <span data-facets-part="filter-count">{% if active_count > 0 %}({{ active_count }}){% endif %}</span>
+            </button>
+          {%- endif -%}
+
+          <p class="toolbar__count" role="status" data-facets-part="count">
+            {{- 'collections.product_count' | t: count: collection.products_count -}}
+          </p>
+
+          {%- if s.enable_sorting -%}
+            <div class="toolbar__sort">
+              <label class="toolbar__sort-label" for="SortBy-{{ section.id }}">{{ 'collections.sort.label' | t }}</label>
+              <div class="select-wrap select-wrap--small">
+                <select class="select" id="SortBy-{{ section.id }}" name="sort_by" form="FacetsForm-{{ section.id }}">
+                  {%- for option in collection.sort_options -%}
+                    <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name | escape }}</option>
+                  {%- endfor -%}
+                </select>
+                {%- render 'icon', name: 'chevron-down', class: 'icon--small' -%}
+              </div>
+              <button type="submit" form="FacetsForm-{{ section.id }}" class="button button--secondary button--small no-js-only">
+                {{- 'collections.filters.apply' | t -}}
+              </button>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="collection-layout__body">
+          {%- if show_filters -%}
+            {% render 'facets', results: collection, section_id: section.id, results_url: collection.url %}
+          {%- elsif s.enable_sorting -%}
+            <form id="FacetsForm-{{ section.id }}" action="{{ collection.url }}" method="get" data-facets-form hidden></form>
+          {%- endif -%}
+
+          <div class="collection-layout__results">
+            {%- if show_filters -%}
+              {%- assign clear_url = collection.url | append: '?sort_by=' | append: sort_by -%}
+              {% render 'active-filters', results: collection, clear_url: clear_url %}
+            {%- endif -%}
+
+            <div class="collection-results" data-facets-part="results">
+              {%- if collection.products.size > 0 -%}
+                <ul class="grid" role="list" style="--cols-mobile: {{ s.columns_mobile }}; --cols-tablet: {{ columns_tablet }}; --cols-desktop: {{ columns }};">
+                  {%- for product in collection.products -%}
+                    {%- liquid
+                      assign loading = 'lazy'
+                      if forloop.index <= 4 and section.index == 1
+                        assign loading = 'eager'
+                      endif
+                    -%}
+                    <li>{% render 'product-card', product: product, section_id: section.id, sizes: sizes, loading: loading %}</li>
+                  {%- endfor -%}
+                </ul>
+                {% render 'pagination', paginate: paginate %}
+              {%- else -%}
+                <div class="empty-state">
+                  <span class="empty-state__icon">{% render 'icon', name: 'search' %}</span>
+                  {%- if active_count > 0 -%}
+                    <p class="h4">{{ 'collections.empty_filtered' | t }}</p>
+                    <a class="button button--secondary" href="{{ collection.url }}" data-facets-link>{{ 'collections.filters.clear_all' | t }}</a>
+                  {%- else -%}
+                    <p class="h4">{{ 'collections.empty' | t }}</p>
+                    <a class="button" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue_shopping' | t }}</a>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      </facets-form>
+    {%- endpaginate -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collezione",
+  "class": "section-main-collection",
+  "enabled_on": { "templates": ["collection"] },
+  "settings": [
+    { "type": "checkbox", "id": "show_description", "label": "Mostra descrizione", "default": true },
+    { "type": "checkbox", "id": "show_image", "label": "Mostra immagine della collezione", "default": false },
+    { "type": "header", "content": "Griglia prodotti" },
+    { "type": "range", "id": "products_per_page", "label": "Prodotti per pagina", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "columns_desktop", "label": "Colonne su desktop", "min": 2, "max": 5, "step": 1, "default": 3 },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Colonne su mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    { "type": "header", "content": "Filtri e ordinamento" },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "Abilita filtri",
+      "info": "Personalizza i filtri con l'app Search & Discovery.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "filter_layout",
+      "label": "Filtri su desktop",
+      "options": [
+        { "value": "sidebar", "label": "Barra laterale" },
+        { "value": "drawer", "label": "Pannello" }
+      ],
+      "default": "sidebar"
+    },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Abilita ordinamento", "default": true },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 }
+  ]
+}
+{% endschema %}

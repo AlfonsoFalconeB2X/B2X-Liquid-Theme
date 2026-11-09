@@ -1,0 +1,22 @@
+{%- comment -%}
+  Blocco prezzo di pagina prodotto e anteprima rapida (parte aggiornata al cambio di variante).
+  Parametri: product, variant, combination_exists, section_id, attributes (block.shopify_attributes)
+{%- endcomment -%}
+<div class="product__price" data-product-part="price" {{ attributes }}>
+  {%- if combination_exists -%}
+    {% render 'price', product: product, variant: variant, size: 'large' %}
+  {%- endif -%}
+  {%- if cart.taxes_included or shop.shipping_policy.body != blank -%}
+    <p class="product__tax text-muted">
+      {%- if cart.taxes_included -%}{{ 'products.product.taxes_included' | t }}{%- endif -%}
+      {%- if shop.shipping_policy.body != blank %}
+        {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url -}}
+      {%- endif -%}
+    </p>
+  {%- endif -%}
+  {%- assign installments_form_id = 'Installments-' | append: section_id -%}
+  {%- form 'product', product, id: installments_form_id, class: 'product__installments' -%}
+    <input type="hidden" name="id" value="{{ variant.id }}">
+    {{ form | payment_terms }}
+  {%- endform -%}
+</div>

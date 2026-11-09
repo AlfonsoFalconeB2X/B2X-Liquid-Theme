@@ -1,0 +1,325 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "B2X",
+    "theme_version": "1.0.0",
+    "theme_author": "B2X",
+    "theme_documentation_url": "https://www.b2x.it",
+    "theme_support_email": "sviluppatori@b2x.it"
+  },
+  {
+    "name": "Colori",
+    "settings": [
+      {
+        "type": "color_scheme_group",
+        "id": "color_schemes",
+        "definition": [
+          { "type": "color", "id": "background", "label": "Sfondo", "default": "#FAF9F6" },
+          {
+            "type": "color_background",
+            "id": "background_gradient",
+            "label": "Sfondo sfumato",
+            "info": "Se impostato sostituisce il colore di sfondo."
+          },
+          { "type": "color", "id": "text", "label": "Testo", "default": "#1D2420" },
+          {
+            "type": "color",
+            "id": "surface",
+            "label": "Superfici",
+            "info": "Card, campi dei form, pannelli.",
+            "default": "#FFFFFF"
+          },
+          { "type": "color", "id": "border", "label": "Filetti", "default": "#E6E3DC" },
+          { "type": "color", "id": "button", "label": "Pulsante principale", "default": "#2D4F43" },
+          { "type": "color", "id": "button_label", "label": "Testo del pulsante principale", "default": "#FFFFFF" },
+          {
+            "type": "color",
+            "id": "secondary_button_label",
+            "label": "Pulsante secondario e link",
+            "default": "#2D4F43"
+          }
+        ],
+        "role": {
+          "text": "text",
+          "background": { "solid": "background", "gradient": "background_gradient" },
+          "links": "secondary_button_label",
+          "icons": "text",
+          "primary_button": "button",
+          "on_primary_button": "button_label",
+          "primary_button_border": "button",
+          "secondary_button": "background",
+          "on_secondary_button": "secondary_button_label",
+          "secondary_button_border": "secondary_button_label"
+        }
+      },
+      {
+        "type": "color_scheme",
+        "id": "page_color_scheme",
+        "label": "Schema della pagina",
+        "info": "Sfondo generale e colori delle parti senza uno schema proprio.",
+        "default": "scheme-1"
+      },
+      {
+        "type": "color_scheme",
+        "id": "drawer_color_scheme",
+        "label": "Schema del carrello a cassetto",
+        "default": "scheme-1"
+      }
+    ]
+  },
+  {
+    "name": "Tipografia",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "type_heading_font",
+        "label": "Font dei titoli",
+        "default": "outfit_n5"
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "label": "Dimensione dei titoli",
+        "min": 80,
+        "max": 130,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Font del testo",
+        "default": "figtree_n4"
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Larghezza massima del contenuto",
+        "min": 1000,
+        "max": 1600,
+        "step": 20,
+        "unit": "px",
+        "default": 1320
+      },
+      { "type": "header", "content": "Forme" },
+      {
+        "type": "range",
+        "id": "button_radius",
+        "label": "Arrotondamento pulsanti",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "px",
+        "default": 12
+      },
+      {
+        "type": "range",
+        "id": "input_radius",
+        "label": "Arrotondamento campi",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "default": 10
+      },
+      {
+        "type": "range",
+        "id": "card_radius",
+        "label": "Arrotondamento card e immagini",
+        "info": "I riquadri delle section usano una volta e mezza questo valore.",
+        "min": 0,
+        "max": 32,
+        "step": 1,
+        "unit": "px",
+        "default": 16
+      }
+    ]
+  },
+  {
+    "name": "Card prodotto",
+    "settings": [
+      {
+        "type": "select",
+        "id": "card_style",
+        "label": "Stile",
+        "options": [
+          { "value": "plain", "label": "Semplice" },
+          { "value": "surface", "label": "Su superficie" }
+        ],
+        "default": "plain"
+      },
+      {
+        "type": "select",
+        "id": "card_image_ratio",
+        "label": "Proporzioni immagine",
+        "options": [
+          { "value": "portrait", "label": "Verticale" },
+          { "value": "square", "label": "Quadrata" },
+          { "value": "landscape", "label": "Orizzontale" },
+          { "value": "natural", "label": "Originale" }
+        ],
+        "default": "portrait"
+      },
+      { "type": "checkbox", "id": "card_secondary_image", "label": "Seconda immagine al passaggio del mouse", "default": true },
+      { "type": "checkbox", "id": "card_show_vendor", "label": "Mostra il marchio", "default": false },
+      { "type": "checkbox", "id": "card_show_sale_badge", "label": "Mostra etichetta \"Offerta\"", "default": true },
+      {
+        "type": "checkbox",
+        "id": "card_quick_add",
+        "label": "Pulsante di aggiunta rapida",
+        "info": "Aggiunge al carrello i prodotti senza varianti; per gli altri apre l'anteprima rapida con le opzioni.",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "card_quick_view",
+        "label": "Anteprima rapida sull'immagine",
+        "info": "Varianti, quantità e aggiunta al carrello senza lasciare la pagina.",
+        "default": true
+      },
+      { "type": "header", "content": "Swatch colore" },
+      { "type": "checkbox", "id": "card_swatches", "label": "Mostra gli swatch sotto il prezzo", "default": true },
+      {
+        "type": "text",
+        "id": "card_swatch_options",
+        "label": "Nomi delle opzioni da mostrare come swatch",
+        "info": "Separati da virgole. Si usano i campioni colore dell'opzione o, in mancanza, l'immagine della variante.",
+        "default": "Colore, Color, Colour"
+      }
+    ]
+  },
+  {
+    "name": "Carrello",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Tipo di carrello",
+        "options": [
+          { "value": "drawer", "label": "Cassetto" },
+          { "value": "page", "label": "Pagina" }
+        ],
+        "default": "drawer"
+      },
+      { "type": "checkbox", "id": "cart_discount", "label": "Campo per i codici sconto", "default": true },
+      {
+        "type": "checkbox",
+        "id": "cart_drawer_note",
+        "label": "Nota dell'ordine nel carrello a cassetto",
+        "info": "Nella pagina carrello si attiva dalla section Carrello.",
+        "default": false
+      },
+      { "type": "header", "content": "Spedizione gratuita" },
+      {
+        "type": "text",
+        "id": "free_shipping_thresholds",
+        "label": "Soglie per valuta",
+        "info": "Formato CODICE:importo separati da virgole, es. EUR:60, CHF:65. Lascia vuoto per non mostrare la barra.",
+        "default": "EUR:60"
+      },
+      { "type": "header", "content": "Attributi dell'ordine" },
+      {
+        "type": "paragraph",
+        "content": "Campi aggiuntivi salvati nell'ordine (es. \"Richiedo fattura\", \"Codice destinatario\"). L'etichetta è anche il nome che leggi nell'ordine."
+      },
+      { "type": "text", "id": "cart_attribute_1_label", "label": "Attributo 1: etichetta" },
+      {
+        "type": "select",
+        "id": "cart_attribute_1_type",
+        "label": "Attributo 1: tipo",
+        "options": [
+          { "value": "text", "label": "Testo" },
+          { "value": "checkbox", "label": "Casella" }
+        ],
+        "default": "text"
+      },
+      { "type": "text", "id": "cart_attribute_2_label", "label": "Attributo 2: etichetta" },
+      {
+        "type": "select",
+        "id": "cart_attribute_2_type",
+        "label": "Attributo 2: tipo",
+        "options": [
+          { "value": "text", "label": "Testo" },
+          { "value": "checkbox", "label": "Casella" }
+        ],
+        "default": "checkbox"
+      }
+    ]
+  },
+  {
+    "name": "Ricerca",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "predictive_search",
+        "label": "Suggerimenti mentre si scrive",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Valuta",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled",
+        "label": "Mostra il codice valuta nei prezzi",
+        "info": "Es. 25,00 € EUR. Il carrello e il checkout mostrano sempre il codice.",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Animazioni",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "animations_reveal",
+        "label": "Comparsa dei contenuti durante lo scorrimento",
+        "info": "Dissolvenza leggera con un piccolo sfalsamento nelle griglie.",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "page_transitions",
+        "label": "Dissolvenza tra le pagine",
+        "info": "Transizioni native del browser (View Transitions): dove non sono supportate la navigazione resta normale.",
+        "default": true
+      },
+      {
+        "type": "paragraph",
+        "content": "Tutte le animazioni si disattivano da sole per chi ha scelto il movimento ridotto nel sistema."
+      }
+    ]
+  },
+  {
+    "name": "Social",
+    "settings": [
+      { "type": "paragraph", "content": "I link compaiono nel footer, nel blocco \"Marchio\"." },
+      { "type": "url", "id": "social_instagram", "label": "Instagram" },
+      { "type": "url", "id": "social_facebook", "label": "Facebook" },
+      { "type": "url", "id": "social_tiktok", "label": "TikTok" },
+      { "type": "url", "id": "social_youtube", "label": "YouTube" },
+      { "type": "url", "id": "social_linkedin", "label": "LinkedIn" },
+      { "type": "url", "id": "social_pinterest", "label": "Pinterest" },
+      { "type": "url", "id": "social_x", "label": "X" }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Immagine quadrata, almeno 96 × 96 px."
+      }
+    ]
+  }
+]

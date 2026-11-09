@@ -1,0 +1,39 @@
+{%- comment -%}
+  Selettori paese/valuta e lingua (form 'localization' nativo).
+  Con JS il form si invia al cambio di selezione; senza JS resta il pulsante.
+{%- endcomment -%}
+{%- form 'localization', class: 'localization-form' -%}
+  {%- if localization.available_countries.size > 1 -%}
+    <div class="field">
+      <label class="visually-hidden" for="LocalizationCountry">{{ 'localization.country' | t }}</label>
+      <div class="select-wrap select-wrap--small">
+        <select class="select" id="LocalizationCountry" name="country_code" data-autosubmit>
+          {%- for country in localization.available_countries -%}
+            <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+              {{- country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol -}})
+            </option>
+          {%- endfor -%}
+        </select>
+        {%- render 'icon', name: 'chevron-down', class: 'icon--small' -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if localization.available_languages.size > 1 -%}
+    <div class="field">
+      <label class="visually-hidden" for="LocalizationLanguage">{{ 'localization.language' | t }}</label>
+      <div class="select-wrap select-wrap--small">
+        <select class="select" id="LocalizationLanguage" name="locale_code" data-autosubmit>
+          {%- for language in localization.available_languages -%}
+            <option value="{{ language.iso_code }}" lang="{{ language.iso_code }}"{% if language.iso_code == localization.language.iso_code %} selected{% endif %}>
+              {{- language.endonym_name | capitalize -}}
+            </option>
+          {%- endfor -%}
+        </select>
+        {%- render 'icon', name: 'chevron-down', class: 'icon--small' -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <button type="submit" class="button button--secondary button--small no-js-only">{{ 'localization.update' | t }}</button>
+{%- endform -%}

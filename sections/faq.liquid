@@ -1,0 +1,116 @@
+{%- assign s = section.settings -%}
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width{% if s.layout == 'stacked' %} page-width--narrow{% endif %}">
+    <div class="faq faq--{{ s.layout }}">
+      {%- render 'section-heading',
+        kicker: s.kicker,
+        heading: s.heading,
+        text: s.text,
+        link_label: s.link_label,
+        link_url: s.link_url,
+        align: 'left'
+      -%}
+
+      <div class="accordion">
+        {%- for block in section.blocks -%}
+          <details
+            class="accordion-item"
+            {% if s.exclusive %}name="faq-{{ section.id }}"{% endif %}
+            {% if forloop.first and s.open_first %}open{% endif %}
+            {{ block.shopify_attributes }}
+          >
+            <summary>
+              <span>{{ block.settings.question | escape }}</span>
+              {%- render 'icon', name: 'plus' -%}
+            </summary>
+            <div class="accordion-item__content rte">{{ block.settings.answer }}</div>
+          </details>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Domande frequenti",
+  "class": "section-faq",
+  "max_blocks": 20,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Etichetta" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Domande frequenti" },
+    { "type": "richtext", "id": "text", "label": "Testo", "default": "<p>Non trovi la risposta? Scrivici.</p>" },
+    { "type": "text", "id": "link_label", "label": "Etichetta link", "default": "Contattaci" },
+    { "type": "url", "id": "link_url", "label": "Link" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Disposizione",
+      "options": [
+        { "value": "split", "label": "Intestazione a lato" },
+        { "value": "stacked", "label": "Intestazione sopra" }
+      ],
+      "default": "split"
+    },
+    { "type": "checkbox", "id": "open_first", "label": "Prima domanda aperta", "default": true },
+    {
+      "type": "checkbox",
+      "id": "exclusive",
+      "label": "Una sola risposta aperta alla volta",
+      "default": false
+    },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "full"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Domanda",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Domanda", "default": "Quanto costa la spedizione?" },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Risposta",
+          "default": "<p>La spedizione è gratuita per ordini superiori a 60 €. Sotto questa soglia il costo viene calcolato al checkout.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Domande frequenti",
+      "blocks": [
+        { "type": "question" },
+        {
+          "type": "question",
+          "settings": {
+            "question": "Posso restituire un prodotto?",
+            "answer": "<p>Sì, hai 30 giorni dalla consegna per richiedere il reso.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "Quali metodi di pagamento accettate?",
+            "answer": "<p>Carte di credito e debito, PayPal e gli altri metodi mostrati al checkout.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

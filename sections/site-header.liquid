@@ -1,0 +1,312 @@
+{%- liquid
+  assign menu = section.settings.menu
+  assign scheme = section.settings.color_scheme
+  assign logo_width = section.settings.logo_width
+  assign logo_width_mobile = logo_width | times: 0.75 | round
+  assign logo_tag = 'div'
+  if request.page_type == 'index'
+    assign logo_tag = 'h1'
+  endif
+-%}
+
+<header
+  class="header-wrapper color-{{ scheme }}{% if section.settings.sticky %} header-wrapper--sticky{% if section.settings.hide_on_scroll %} header-wrapper--hide-on-scroll{% endif %}{% endif %}{% if section.settings.show_border %} header-wrapper--border{% endif %}"
+  style="--logo-width: {{ logo_width }}px; --logo-width-mobile: {{ logo_width_mobile }}px;"
+>
+  <div class="header page-width header--menu-{{ section.settings.menu_position }}">
+    <div class="header__start">
+      <button
+        type="button"
+        class="icon-button header__menu-toggle"
+        popovertarget="MenuDrawer"
+        aria-label="{{ 'header.open_menu' | t }}"
+      >
+        {%- render 'icon', name: 'menu' -%}
+      </button>
+    </div>
+
+    <{{ logo_tag }} class="header__logo">
+      <a href="{{ routes.root_url }}" class="header__logo-link">
+        {%- if section.settings.logo != blank -%}
+          {%- liquid
+            assign logo_width_2x = logo_width | times: 2
+            assign logo_widths = logo_width_mobile | append: ', ' | append: logo_width | append: ', ' | append: logo_width_2x
+            assign logo_sizes = '(min-width: 990px) ' | append: logo_width | append: 'px, ' | append: logo_width_mobile | append: 'px'
+          -%}
+          {{
+            section.settings.logo
+            | image_url: width: logo_width_2x
+            | image_tag:
+              widths: logo_widths,
+              sizes: logo_sizes,
+              alt: shop.name,
+              loading: 'eager',
+              class: 'header__logo-image'
+          }}
+        {%- else -%}
+          <span class="header__logo-text">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+    </{{ logo_tag }}>
+
+    {%- if menu != blank -%}
+      <nav class="header__nav" aria-label="{{ 'header.main_navigation' | t }}">
+        <ul class="menu" role="list">
+          {%- for link in menu.links -%}
+            <li class="menu__item">
+              {%- if link.links != blank -%}
+                {%- liquid
+                  assign is_mega = false
+                  for child in link.links
+                    if child.links != blank
+                      assign is_mega = true
+                    endif
+                  endfor
+                -%}
+                <details class="menu-dropdown{% if is_mega %} menu-dropdown--mega{% endif %}" data-menu-dropdown>
+                  <summary class="menu__link{% if link.child_active %} is-active{% endif %}">
+                    {{- link.title | escape -}}
+                    {%- render 'icon', name: 'chevron-down', class: 'icon--small' -%}
+                  </summary>
+                  <div class="dropdown{% if is_mega %} dropdown--mega{% endif %} color-{{ scheme }}">
+                    {%- if is_mega -%}
+                      <div class="mega">
+                        {%- for child in link.links -%}
+                          <div class="mega__column">
+                            <a class="mega__title" href="{{ child.url }}"{% if child.current %} aria-current="page"{% endif %}>
+                              {{- child.title | escape -}}
+                            </a>
+                            {%- if child.links != blank -%}
+                              <ul class="mega__list" role="list">
+                                {%- for grandchild in child.links -%}
+                                  <li>
+                                    <a class="dropdown__link" href="{{ grandchild.url }}"{% if grandchild.current %} aria-current="page"{% endif %}>
+                                      {{- grandchild.title | escape -}}
+                                    </a>
+                                  </li>
+                                {%- endfor -%}
+                              </ul>
+                            {%- endif -%}
+                          </div>
+                        {%- endfor -%}
+                      </div>
+                    {%- else -%}
+                      <ul class="dropdown__list" role="list">
+                        {%- for child in link.links -%}
+                          <li>
+                            <a class="dropdown__link" href="{{ child.url }}"{% if child.current %} aria-current="page"{% endif %}>
+                              {{- child.title | escape -}}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </div>
+                </details>
+              {%- else -%}
+                <a class="menu__link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+                  {{- link.title | escape -}}
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    <div class="header__end">
+      <button type="button" class="icon-button" popovertarget="SearchModal" aria-label="{{ 'header.open_search' | t }}">
+        {%- render 'icon', name: 'search' -%}
+      </button>
+
+      {%- if shop.customer_accounts_enabled and section.settings.show_account -%}
+        <a class="icon-button header__account" href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}">
+          {%- render 'icon', name: 'user' -%}
+          <span class="visually-hidden">
+            {%- if customer -%}{{ 'header.account' | t }}{%- else -%}{{ 'header.log_in' | t }}{%- endif -%}
+          </span>
+        </a>
+      {%- endif -%}
+
+      {% render 'cart-icon' %}
+    </div>
+  </div>
+
+  <div id="MenuDrawer" class="drawer drawer--left color-{{ scheme }}" popover>
+    <div class="drawer__header">
+      <p class="drawer__title">{{ 'header.menu' | t }}</p>
+      <button type="button" class="icon-button" popovertarget="MenuDrawer" popovertargetaction="hide" aria-label="{{ 'general.close' | t }}">
+        {%- render 'icon', name: 'close' -%}
+      </button>
+    </div>
+
+    <nav class="drawer__body" aria-label="{{ 'header.mobile_navigation' | t }}">
+      {%- if menu != blank -%}
+        <ul class="mobile-nav" role="list">
+          {%- for link in menu.links -%}
+            <li class="mobile-nav__item">
+              {%- if link.links != blank -%}
+                <details class="mobile-nav__details"{% if link.child_active %} open{% endif %}>
+                  <summary class="mobile-nav__link">
+                    {{- link.title | escape -}}
+                    {%- render 'icon', name: 'chevron-down', class: 'icon--small' -%}
+                  </summary>
+                  <ul class="mobile-nav__sub" role="list">
+                    <li>
+                      <a class="mobile-nav__sublink mobile-nav__sublink--all" href="{{ link.url }}">
+                        {{- 'header.view_all' | t: title: link.title -}}
+                      </a>
+                    </li>
+                    {%- for child in link.links -%}
+                      <li>
+                        <a class="mobile-nav__sublink" href="{{ child.url }}"{% if child.current %} aria-current="page"{% endif %}>
+                          {{- child.title | escape -}}
+                        </a>
+                        {%- if child.links != blank -%}
+                          <ul class="mobile-nav__sub mobile-nav__sub--nested" role="list">
+                            {%- for grandchild in child.links -%}
+                              <li>
+                                <a class="mobile-nav__sublink" href="{{ grandchild.url }}"{% if grandchild.current %} aria-current="page"{% endif %}>
+                                  {{- grandchild.title | escape -}}
+                                </a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </details>
+              {%- else -%}
+                <a class="mobile-nav__link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+                  {{- link.title | escape -}}
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </nav>
+
+    {%- if shop.customer_accounts_enabled and section.settings.show_account -%}
+      <div class="drawer__footer">
+        <a class="button button--secondary button--full" href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}">
+          {%- render 'icon', name: 'user', class: 'icon--small' -%}
+          {%- if customer -%}{{ 'header.account' | t }}{%- else -%}{{ 'header.log_in' | t }}{%- endif -%}
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div id="SearchModal" class="search-modal color-{{ scheme }}" popover>
+    <predictive-search class="search-modal__inner"{% if settings.predictive_search %} data-enabled{% endif %}>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-form">
+        <label class="visually-hidden" for="HeaderSearch">{{ 'search.label' | t }}</label>
+        <div class="search-form__field">
+          {%- render 'icon', name: 'search', class: 'search-form__icon' -%}
+          <input
+            class="search-form__input"
+            id="HeaderSearch"
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ 'search.placeholder' | t }}"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-describedby="PredictiveSearchStatus"
+          >
+          <input type="hidden" name="options[prefix]" value="last">
+          <button type="button" class="icon-button" popovertarget="SearchModal" popovertargetaction="hide" aria-label="{{ 'general.close' | t }}">
+            {%- render 'icon', name: 'close' -%}
+          </button>
+        </div>
+      </form>
+      <div class="predictive-results" data-predictive-results></div>
+      <p class="visually-hidden" id="PredictiveSearchStatus" role="status" data-predictive-status></p>
+    </predictive-search>
+  </div>
+</header>
+
+{%- if request.page_type == 'index' -%}
+  {%- comment -%}
+    L'URL con il segnaposto search_term_string tra graffe va calcolato in un tag assign: in un output il
+    tokenizer di Shopify si ferma alla prima graffa chiusa, anche dentro una stringa, e rifiuta il file
+    (Theme Check non lo segnala).
+  {%- endcomment -%}
+  {%- assign search_action_target = request.origin | append: routes.search_url | append: '?q={search_term_string}' -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      {%- if section.settings.logo -%}
+        "logo": {{ section.settings.logo | image_url: width: 512 | prepend: 'https:' | json }},
+      {%- endif -%}
+      "url": {{ request.origin | append: routes.root_url | json }}
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {{ search_action_target | json }},
+        "query-input": "required name=search_term_string"
+      },
+      "url": {{ request.origin | append: routes.root_url | json }}
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Larghezza logo",
+      "min": 60,
+      "max": 260,
+      "step": 4,
+      "unit": "px",
+      "default": 120
+    },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    {
+      "type": "select",
+      "id": "menu_position",
+      "label": "Posizione del menu (desktop)",
+      "options": [
+        { "value": "left", "label": "Accanto al logo" },
+        { "value": "center", "label": "Al centro" }
+      ],
+      "default": "center"
+    },
+    { "type": "checkbox", "id": "sticky", "label": "Header fisso durante lo scorrimento", "default": true },
+    {
+      "type": "checkbox",
+      "id": "hide_on_scroll",
+      "label": "Nascondi scendendo, mostra risalendo",
+      "info": "Solo con l'header fisso. Lascia più spazio ai contenuti su mobile.",
+      "default": true
+    },
+    { "type": "checkbox", "id": "show_border", "label": "Mostra filetto inferiore", "default": true },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Mostra accesso account",
+      "info": "Visibile solo se gli account cliente sono attivi.",
+      "default": true
+    },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" }
+  ]
+}
+{% endschema %}

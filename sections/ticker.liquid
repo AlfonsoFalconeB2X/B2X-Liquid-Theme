@@ -1,0 +1,175 @@
+{%- liquid
+  assign s = section.settings
+  assign direction = 'normal'
+  if s.direction == 'right'
+    assign direction = 'reverse'
+  endif
+-%}
+
+<div {% render 'section-attributes', section: section, class: 'section--ticker' %}>
+  <div class="section__inner{% if s.full_width == false %} page-width{% endif %}">
+    {%- if s.heading != blank -%}
+      <h2 class="ticker__heading{% if s.full_width %} page-width{% endif %}">{{ s.heading | escape }}</h2>
+    {%- endif -%}
+
+    <ticker-strip
+      class="ticker{% if s.pause_on_hover %} ticker--hover-pause{% endif %}{% if s.grayscale %} ticker--grayscale{% endif %}"
+      data-speed="{{ s.speed }}"
+      style="--ticker-direction: {{ direction }}; --ticker-gap: {{ s.gap }}px; --logo-height: {{ s.logo_height }}px;"
+    >
+      <div class="ticker__viewport" role="region" aria-label="{{ s.heading | default: shop.name | escape }}">
+        <div class="ticker__track" data-ticker-track>
+          <ul class="ticker__group" role="list" data-ticker-group>
+            {%- for block in section.blocks -%}
+              <li class="ticker__item ticker__item--{{ block.type }}" {{ block.shopify_attributes }}>
+                {%- case block.type -%}
+                  {%- when 'logo' -%}
+                    {%- capture logo -%}
+                      {%- if block.settings.image != blank -%}
+                        {%- assign logo_width = block.settings.image.aspect_ratio | times: s.logo_height | times: 2 | round -%}
+                        {{ block.settings.image | image_url: width: logo_width | image_tag: loading: 'lazy', alt: block.settings.name, class: 'ticker__logo' }}
+                      {%- else -%}
+                        <span class="ticker__logo-placeholder">{{ block.settings.name | default: 'Logo' | escape }}</span>
+                      {%- endif -%}
+                    {%- endcapture -%}
+                    {%- if block.settings.link != blank -%}
+                      <a href="{{ block.settings.link }}" class="ticker__link">{{ logo }}</a>
+                    {%- else -%}
+                      {{ logo }}
+                    {%- endif -%}
+                  {%- when 'text' -%}
+                    <span class="ticker__text ticker__text--{{ s.text_size }}">
+                      {%- if block.settings.link != blank -%}
+                        <a href="{{ block.settings.link }}" class="ticker__link">{{ block.settings.text | escape }}</a>
+                      {%- else -%}
+                        {{ block.settings.text | escape }}
+                      {%- endif -%}
+                    </span>
+                    {%- if s.separator != 'none' -%}
+                      <span class="ticker__separator" aria-hidden="true">
+                        {%- case s.separator -%}
+                          {%- when 'dot' -%}●
+                          {%- when 'star' -%}{% render 'icon', name: 'star', class: 'icon--small icon--fill' %}
+                          {%- when 'slash' -%}/
+                        {%- endcase -%}
+                      </span>
+                    {%- endif -%}
+                {%- endcase -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="icon-button ticker__toggle"
+        data-ticker-toggle
+        aria-pressed="false"
+        aria-label="{{ 'sections.ticker.pause' | t }}"
+        data-label-pause="{{ 'sections.ticker.pause' | t }}"
+        data-label-play="{{ 'sections.ticker.play' | t }}"
+      >
+        <svg class="icon icon--small ticker__icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6v12M15 6v12"/></svg>
+        {%- render 'icon', name: 'play', class: 'icon--small icon--fill ticker__icon-play' -%}
+      </button>
+    </ticker-strip>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Ticker",
+  "class": "section-ticker",
+  "max_blocks": 20,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Titolo", "info": "Facoltativo. Se vuoto è usato solo dai lettori di schermo il nome del negozio." },
+    { "type": "range", "id": "speed", "label": "Velocità", "min": 10, "max": 120, "step": 5, "unit": "px", "default": 40, "info": "Pixel al secondo." },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direzione",
+      "options": [
+        { "value": "left", "label": "Verso sinistra" },
+        { "value": "right", "label": "Verso destra" }
+      ],
+      "default": "left"
+    },
+    { "type": "checkbox", "id": "pause_on_hover", "label": "Pausa al passaggio del mouse", "default": true },
+    { "type": "range", "id": "gap", "label": "Spazio tra gli elementi", "min": 16, "max": 120, "step": 4, "unit": "px", "default": 48 },
+    { "type": "header", "content": "Loghi" },
+    { "type": "range", "id": "logo_height", "label": "Altezza loghi", "min": 20, "max": 96, "step": 4, "unit": "px", "default": 36 },
+    { "type": "checkbox", "id": "grayscale", "label": "Loghi in scala di grigi", "default": true },
+    { "type": "header", "content": "Testi" },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Dimensione testi",
+      "options": [
+        { "value": "small", "label": "Piccola" },
+        { "value": "medium", "label": "Media" },
+        { "value": "large", "label": "Grande" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "separator",
+      "label": "Separatore tra i testi",
+      "options": [
+        { "value": "none", "label": "Nessuno" },
+        { "value": "dot", "label": "Punto" },
+        { "value": "star", "label": "Stella" },
+        { "value": "slash", "label": "Barra" }
+      ],
+      "default": "star"
+    },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "checkbox", "id": "full_width", "label": "Da bordo a bordo", "default": true },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-2" },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 28 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 28 }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Testo",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Testo", "default": "Spedizione in 24/48 ore" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Logo" },
+        { "type": "text", "id": "name", "label": "Nome", "info": "Testo alternativo del logo." },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Ticker di testi",
+      "blocks": [
+        { "type": "text", "settings": { "text": "Spedizione in 24/48 ore" } },
+        { "type": "text", "settings": { "text": "Reso gratuito entro 30 giorni" } },
+        { "type": "text", "settings": { "text": "Pagamenti sicuri" } },
+        { "type": "text", "settings": { "text": "Assistenza dedicata" } }
+      ]
+    },
+    {
+      "name": "Ticker di loghi",
+      "settings": { "color_scheme": "scheme-1", "separator": "none" },
+      "blocks": [
+        { "type": "logo", "settings": { "name": "Marchio 1" } },
+        { "type": "logo", "settings": { "name": "Marchio 2" } },
+        { "type": "logo", "settings": { "name": "Marchio 3" } },
+        { "type": "logo", "settings": { "name": "Marchio 4" } },
+        { "type": "logo", "settings": { "name": "Marchio 5" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

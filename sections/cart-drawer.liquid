@@ -1,0 +1,45 @@
+{%- comment -%}
+  Carrello a cassetto, reso dal layout quando Impostazioni tema → Carrello → Tipo è "Cassetto".
+  Il contenuto di [data-cart-section="cart-drawer"] viene sostituito da theme.js dopo ogni modifica.
+{%- endcomment -%}
+<cart-drawer>
+  <dialog class="drawer drawer--right color-{{ settings.drawer_color_scheme }}" aria-labelledby="CartDrawerTitle">
+    <div class="cart-drawer" data-cart-section="cart-drawer">
+      <div class="drawer__header">
+        <h2 class="drawer__title" id="CartDrawerTitle" tabindex="-1" data-cart-focus-fallback>
+          {{- 'cart.title' | t -}}
+          {%- if cart.item_count > 0 %} <span class="text-muted">({{ cart.item_count }})</span>{% endif -%}
+        </h2>
+        <button type="button" class="icon-button" data-cart-close aria-label="{{ 'general.close' | t }}">
+          {%- render 'icon', name: 'close' -%}
+        </button>
+      </div>
+
+      {%- if cart.empty? -%}
+        <div class="cart-drawer__empty empty-state">
+          <span class="empty-state__icon">{% render 'icon', name: 'bag' %}</span>
+          <p class="h4">{{ 'cart.empty' | t }}</p>
+          <a class="button" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue_shopping' | t }}</a>
+        </div>
+      {%- else -%}
+        <div class="drawer__body cart-drawer__body">
+          {% render 'cart-free-shipping' %}
+          {% render 'cart-lines', context: 'drawer' %}
+          {% render 'cart-note', context: 'drawer', show_note: settings.cart_drawer_note %}
+        </div>
+
+        <div class="drawer__footer">
+          {% render 'cart-discount', context: 'drawer' %}
+          {% render 'cart-totals' %}
+          <form action="{{ routes.cart_url }}" method="post" class="cart-drawer__checkout">
+            <button type="submit" name="checkout" class="button button--large button--full">
+              {%- render 'icon', name: 'lock', class: 'icon--small' -%}
+              {{ 'cart.checkout' | t }}
+            </button>
+            <a class="link cart-drawer__view" href="{{ routes.cart_url }}">{{ 'cart.view' | t }}</a>
+          </form>
+        </div>
+      {%- endif -%}
+    </div>
+  </dialog>
+</cart-drawer>

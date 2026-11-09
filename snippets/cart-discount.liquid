@@ -1,0 +1,34 @@
+{%- comment -%}
+  Codici sconto del carrello (cassetto e pagina). Con JS: <cart-discount> in theme.js (cart/update.js con `discount`).
+  Senza JS il form invia il codice a /cart/update.
+  Parametro: context ('drawer' | 'page')
+{%- endcomment -%}
+{%- if settings.cart_discount -%}
+  <cart-discount class="cart-discount">
+    {%- if cart.discount_codes.size > 0 -%}
+      <ul class="tag-list" role="list" aria-label="{{ 'cart.discount.applied' | t }}">
+        {%- for discount in cart.discount_codes -%}
+          <li>
+            <button
+              type="button"
+              class="chip-link{% unless discount.applicable %} chip-link--muted{% endunless %}"
+              data-discount-remove="{{ discount.code | escape }}"
+              data-applicable="{{ discount.applicable }}"
+            >
+              {{- discount.code | escape -}}
+              {%- unless discount.applicable %} · {{ 'cart.discount.not_applicable' | t }}{% endunless -%}
+              {%- render 'icon', name: 'close', class: 'icon--small' -%}
+              <span class="visually-hidden">{{ 'cart.discount.remove' | t }}</span>
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    <form action="{{ routes.cart_update_url }}" method="post" class="inline-form inline-form--small" data-discount-form>
+      <label class="visually-hidden" for="Discount-{{ context }}">{{ 'cart.discount.label' | t }}</label>
+      <input class="input" id="Discount-{{ context }}" type="text" name="discount" placeholder="{{ 'cart.discount.label' | t }}" autocomplete="off" spellcheck="false" autocapitalize="characters">
+      <button type="submit" class="button button--secondary button--small">{{ 'cart.discount.apply' | t }}</button>
+    </form>
+    <p class="form-message form-message--error" role="alert" data-discount-error hidden></p>
+  </cart-discount>
+{%- endif -%}

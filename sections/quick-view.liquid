@@ -1,0 +1,105 @@
+{%- comment -%}
+  Contenuto dell'anteprima rapida, richiesto da assets/quick-view.js con
+  /products/<handle>?section_id=quick-view (Section Rendering API). Non va aggiunta alle pagine.
+  Usa gli stessi snippet e lo stesso JS (assets/product.js) della pagina prodotto.
+{%- endcomment -%}
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign form_id = 'ProductForm-quick-view'
+
+  assign combination_exists = true
+  for option in product.options_with_values
+    assign option_index = forloop.index0
+    if current_variant.options[option_index] != option.selected_value
+      assign combination_exists = false
+    endif
+  endfor
+
+  assign can_buy = false
+  if combination_exists and current_variant.available
+    assign can_buy = true
+  endif
+
+  assign media_ratio = product.featured_media.preview_image.aspect_ratio | default: 1
+  if settings.card_image_ratio == 'square'
+    assign media_ratio = 1
+  elsif settings.card_image_ratio == 'portrait'
+    assign media_ratio = 0.8
+  endif
+-%}
+
+<product-page class="quick-view__content" data-section="quick-view" data-url="{{ product.url }}">
+  <div class="quick-view__media">
+    <media-gallery class="gallery gallery--carousel">
+      <ul class="gallery__track" role="list" data-gallery-track aria-label="{{ 'products.product.media_gallery' | t }}">
+        {%- for media in product.media limit: 8 -%}
+          <li class="gallery__item" data-media-id="{{ media.id }}">
+            {%- liquid
+              assign loading = 'lazy'
+              if forloop.first
+                assign loading = 'eager'
+              endif
+            -%}
+            {% render 'product-media', media: media, title: product.title, ratio: media_ratio, sizes: '(min-width: 750px) 30rem, 100vw', loading: loading %}
+          </li>
+        {%- else -%}
+          <li class="gallery__item">
+            <div class="media" style="--ratio: 1;">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+          </li>
+        {%- endfor -%}
+      </ul>
+      {%- if product.media.size > 1 -%}
+        {%- assign shown_media = product.media.size | at_most: 8 -%}
+        <div class="gallery__nav">
+          <button type="button" class="icon-button" data-gallery-prev aria-label="{{ 'products.product.previous_media' | t }}">
+            {%- render 'icon', name: 'chevron-left' -%}
+          </button>
+          <p class="gallery__counter" aria-live="polite"><span data-gallery-current>1</span> / {{ shown_media }}</p>
+          <button type="button" class="icon-button" data-gallery-next aria-label="{{ 'products.product.next_media' | t }}">
+            {%- render 'icon', name: 'chevron-right' -%}
+          </button>
+        </div>
+      {%- endif -%}
+    </media-gallery>
+  </div>
+
+  <div class="quick-view__info product__info">
+    <div class="product__heading">
+      {%- if settings.card_show_vendor and product.vendor != blank -%}
+        <p class="kicker">{{ product.vendor | escape }}</p>
+      {%- endif -%}
+      <h2 class="h3" id="QuickViewTitle">
+        <a href="{{ product.url }}">{{ product.title | escape }}</a>
+      </h2>
+    </div>
+
+    {% render 'product-price', product: product, variant: current_variant, combination_exists: combination_exists, section_id: 'quick-view' %}
+
+    {% render 'product-variant-picker',
+      product: product,
+      variant: current_variant,
+      combination_exists: combination_exists,
+      section_id: 'quick-view',
+      style: 'buttons',
+      swatches: true
+    %}
+
+    {% render 'product-quantity', variant: current_variant, section_id: 'quick-view', form_id: form_id %}
+
+    {% render 'product-buy-buttons',
+      product: product,
+      variant: current_variant,
+      can_buy: can_buy,
+      combination_exists: combination_exists,
+      section_id: 'quick-view',
+      form_id: form_id,
+      show_dynamic_checkout: false,
+      show_gift_card_recipient: true
+    %}
+
+    <a class="link" href="{{ product.url }}">
+      {{- 'products.product.quick_view_details' | t -}}
+      {%- render 'icon', name: 'arrow-right', class: 'icon--small' -%}
+    </a>
+  </div>
+</product-page>

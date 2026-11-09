@@ -1,0 +1,50 @@
+{%- comment -%}
+  Prezzo di un prodotto o di una variante.
+  Parametri: product (obbligatorio), variant (opzionale: altrimenti la variante selezionata o la prima disponibile),
+  size ('large' per la pagina prodotto), show_from (true: "Da …" se le varianti hanno prezzi diversi)
+{%- endcomment -%}
+{%- liquid
+  assign target = variant | default: product.selected_or_first_available_variant
+  assign price = target.price
+  assign compare_at = target.compare_at_price
+  assign on_sale = false
+  if compare_at > price
+    assign on_sale = true
+  endif
+
+  assign money_price = price | money
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+  endif
+-%}
+<div class="price{% if size == 'large' %} price--large{% endif %}{% if on_sale %} price--on-sale{% endif %}">
+  {%- if show_from and product.price_varies -%}
+    {%- liquid
+      assign money_min = product.price_min | money
+      if settings.currency_code_enabled
+        assign money_min = product.price_min | money_with_currency
+      endif
+    -%}
+    <span class="price__current">{{ 'products.product.price.from_price' | t: price: money_min }}</span>
+  {%- elsif on_sale -%}
+    <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+    <span class="price__current price__current--sale">{{ money_price }}</span>
+    <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+    <s class="price__compare">{{ compare_at | money }}</s>
+  {%- else -%}
+    <span class="price__current">{{ money_price }}</span>
+  {%- endif -%}
+
+  {%- if target.unit_price_measurement -%}
+    <span class="price__unit">
+      <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+      {{- target.unit_price | money -}}
+      <span aria-hidden="true">/</span>
+      <span class="visually-hidden">{{ 'accessibility.unit_price_separator' | t }}</span>
+      {%- if target.unit_price_measurement.reference_value != 1 -%}
+        {{- target.unit_price_measurement.reference_value -}}
+      {%- endif -%}
+      {{ target.unit_price_measurement.reference_unit }}
+    </span>
+  {%- endif -%}
+</div>

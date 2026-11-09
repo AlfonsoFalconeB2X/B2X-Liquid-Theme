@@ -1,0 +1,220 @@
+{%- liquid
+  assign s = section.settings
+  assign has_details = false
+  for block in section.blocks
+    assign has_details = true
+  endfor
+  assign form_id = 'ContactForm-' | append: section.id
+-%}
+
+<div {% render 'section-attributes', section: section %}>
+  <div class="section__inner page-width">
+    <div class="contact{% if has_details %} contact--has-aside{% endif %}">
+      <div class="contact__details">
+        {%- render 'section-heading', kicker: s.kicker, heading: s.heading, text: s.text -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign value = blank
+            assign href = blank
+            case block.type
+              when 'email'
+                assign value = shop.email
+                assign href = 'mailto:' | append: shop.email
+                assign icon = 'mail'
+              when 'phone'
+                assign value = shop.phone
+                assign href = 'tel:' | append: shop.phone
+                assign icon = 'phone'
+              when 'address'
+                assign value = shop.address.summary
+                assign icon = 'pin'
+              when 'text'
+                assign value = block.settings.text
+                assign icon = block.settings.icon
+            endcase
+          -%}
+          {%- if value != blank -%}
+            <div class="contact__detail" {{ block.shopify_attributes }}>
+              {%- render 'icon', name: icon -%}
+              <div>
+                {%- if block.settings.label != blank -%}
+                  <p><strong>{{ block.settings.label | escape }}</strong></p>
+                {%- endif -%}
+                {%- if href != blank -%}
+                  <a href="{{ href }}">{{ value | escape }}</a>
+                {%- elsif block.type == 'text' -%}
+                  <div class="rte text-muted">{{ value }}</div>
+                {%- else -%}
+                  <p class="text-muted">{{ value | escape }}</p>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="contact__form">
+        {%- form 'contact', id: form_id -%}
+          {%- if form.posted_successfully? -%}
+            <p class="form-message form-message--success" role="status" tabindex="-1" autofocus>
+              {%- render 'icon', name: 'check', class: 'icon--small' -%}
+              {{ 'contact.success' | t }}
+            </p>
+          {%- elsif form.errors -%}
+            <div class="form-message form-message--error" role="alert" tabindex="-1" autofocus>
+              {%- render 'icon', name: 'info', class: 'icon--small' -%}
+              <div>
+                <p>{{ 'contact.error_heading' | t }}</p>
+                <ul>
+                  {%- for field in form.errors -%}
+                    <li>
+                      {%- if field == 'form' -%}
+                        {{ form.errors.messages[field] }}
+                      {%- else -%}
+                        {{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}
+                      {%- endif -%}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            </div>
+          {%- endif -%}
+
+          <div class="form-grid form-grid--2">
+            <div class="field">
+              <label class="field__label" for="{{ form_id }}-name">{{ 'contact.name' | t }}</label>
+              <input class="input" id="{{ form_id }}-name" type="text" name="contact[{{ 'contact.name' | t }}]" value="{{ form.name }}" autocomplete="name">
+            </div>
+            <div class="field">
+              <label class="field__label" for="{{ form_id }}-email">{{ 'contact.email' | t }} <span aria-hidden="true">*</span></label>
+              <input
+                class="input"
+                id="{{ form_id }}-email"
+                type="email"
+                name="contact[email]"
+                value="{{ form.email }}"
+                autocomplete="email"
+                spellcheck="false"
+                autocapitalize="off"
+                required
+                {% if form.errors contains 'email' %}aria-invalid="true"{% endif %}
+              >
+            </div>
+            {%- if s.show_phone -%}
+              <div class="field field--full">
+                <label class="field__label" for="{{ form_id }}-phone">{{ 'contact.phone' | t }}</label>
+                <input class="input" id="{{ form_id }}-phone" type="tel" name="contact[{{ 'contact.phone' | t }}]" value="{{ form.phone }}" autocomplete="tel">
+              </div>
+            {%- endif -%}
+            <div class="field field--full">
+              <label class="field__label" for="{{ form_id }}-message">{{ 'contact.message' | t }} <span aria-hidden="true">*</span></label>
+              <textarea class="textarea" id="{{ form_id }}-message" name="contact[body]" rows="6" required>{{ form.body }}</textarea>
+            </div>
+            {%- if s.privacy_label != blank -%}
+              <div class="field field--full">
+                <label class="checkbox">
+                  <input type="checkbox" name="contact[{{ 'contact.privacy_field' | t }}]" value="{{ 'contact.privacy_accepted' | t }}" required>
+                  <span class="rte">{{ s.privacy_label }}</span>
+                </label>
+              </div>
+            {%- endif -%}
+            <div class="field field--full">
+              <button type="submit" class="button button--large">{{ 'contact.send' | t }}</button>
+            </div>
+          </div>
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Modulo di contatto",
+  "class": "section-contact-form",
+  "max_blocks": 6,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Etichetta" },
+    { "type": "text", "id": "heading", "label": "Titolo", "default": "Scrivici" },
+    { "type": "richtext", "id": "text", "label": "Testo", "default": "<p>Rispondiamo entro un giorno lavorativo.</p>" },
+    { "type": "checkbox", "id": "show_phone", "label": "Mostra campo telefono", "default": true },
+    {
+      "type": "richtext",
+      "id": "privacy_label",
+      "label": "Testo del consenso privacy",
+      "info": "La casella è obbligatoria. Lascia vuoto per non mostrarla.",
+      "default": "<p>Ho letto l'informativa sulla privacy e acconsento al trattamento dei miei dati.</p>"
+    },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "full"
+    },
+    { "type": "range", "id": "padding_top", "label": "Spazio sopra", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Spazio sotto", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "blocks": [
+    {
+      "type": "email",
+      "name": "Email del negozio",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Etichetta", "default": "Email" },
+        { "type": "paragraph", "content": "Mostra l'email del negozio (Impostazioni → Dettagli del negozio)." }
+      ]
+    },
+    {
+      "type": "phone",
+      "name": "Telefono del negozio",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Etichetta", "default": "Telefono" },
+        { "type": "paragraph", "content": "Mostra il telefono del negozio, se impostato." }
+      ]
+    },
+    {
+      "type": "address",
+      "name": "Indirizzo del negozio",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Etichetta", "default": "Indirizzo" },
+        { "type": "paragraph", "content": "Mostra l'indirizzo del negozio, se impostato." }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Testo",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Etichetta", "default": "Orari" },
+        { "type": "richtext", "id": "text", "label": "Testo", "default": "<p>Lun–Ven, 9:00–18:00</p>" },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icona",
+          "options": [
+            { "value": "info", "label": "Informazioni" },
+            { "value": "chat", "label": "Assistenza" },
+            { "value": "pin", "label": "Luogo" },
+            { "value": "truck", "label": "Spedizione" }
+          ],
+          "default": "info"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Modulo di contatto",
+      "blocks": [{ "type": "email" }, { "type": "phone" }, { "type": "text" }]
+    }
+  ]
+}
+{% endschema %}

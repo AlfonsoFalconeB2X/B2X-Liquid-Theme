@@ -1,0 +1,17 @@
+{%- comment -%}
+  Attributi del contenitore esterno di una section di contenuto.
+  Uso: <div {% render 'section-attributes', section: section, class: 'section--hero' %}>
+         <div class="section__inner page-width">…</div>
+       </div>
+
+  Setting letti dalla section: color_scheme, section_style ('full' | 'boxed'), padding_top, padding_bottom.
+  - full: lo schema colora tutta la larghezza.
+  - boxed: lo schema colora un riquadro arrotondato (.section__inner) dentro la larghezza della pagina.
+{%- endcomment -%}
+{%- liquid
+  assign scheme = section.settings.color_scheme | default: settings.page_color_scheme
+  assign style = section.settings.section_style | default: 'full'
+  assign padding_top = section.settings.padding_top | default: 0
+  assign padding_bottom = section.settings.padding_bottom | default: 0
+-%}
+id="Section-{{ section.id }}" class="section section--{{ style }} color-{{ scheme }}{% if class != blank %} {{ class }}{% endif %}" style="--pt: {{ padding_top }}px; --pb: {{ padding_bottom }}px;{% if style_vars != blank %} {{ style_vars }}{% endif %}"

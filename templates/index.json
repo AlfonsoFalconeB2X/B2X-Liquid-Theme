@@ -1,0 +1,230 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "layout": "split",
+        "kicker": "Nuova collezione",
+        "heading": "Pezzi essenziali, scelti con cura",
+        "heading_size": "xl",
+        "text": "<p>Materiali buoni, forme semplici e spedizione veloce in tutta Italia.</p>",
+        "button_label": "Scopri i prodotti",
+        "button_link": "shopify://collections/all",
+        "button_label_2": "",
+        "content_align": "left",
+        "media_position": "end",
+        "image_ratio": "portrait",
+        "color_scheme": "scheme-2",
+        "section_style": "boxed",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "ticker": {
+      "type": "ticker",
+      "blocks": {
+        "t1": { "type": "text", "settings": { "text": "Spedizione in 24/48 ore", "link": "" } },
+        "t2": { "type": "text", "settings": { "text": "Reso gratuito entro 30 giorni", "link": "" } },
+        "t3": { "type": "text", "settings": { "text": "Pagamenti sicuri", "link": "" } },
+        "t4": { "type": "text", "settings": { "text": "Assistenza dedicata", "link": "" } }
+      },
+      "block_order": ["t1", "t2", "t3", "t4"],
+      "settings": {
+        "speed": 40,
+        "direction": "left",
+        "pause_on_hover": true,
+        "separator": "star",
+        "text_size": "medium",
+        "full_width": true,
+        "color_scheme": "scheme-1",
+        "padding_top": 24,
+        "padding_bottom": 24
+      }
+    },
+    "features": {
+      "type": "multicolumn",
+      "blocks": {
+        "shipping": {
+          "type": "column",
+          "settings": { "icon": "truck", "title": "Spedizione veloce", "text": "<p>Consegna in 24/48 ore in tutta Italia.</p>" }
+        },
+        "returns": {
+          "type": "column",
+          "settings": { "icon": "return", "title": "Reso facile", "text": "<p>Hai 30 giorni per cambiare idea.</p>" }
+        },
+        "payments": {
+          "type": "column",
+          "settings": { "icon": "lock", "title": "Pagamenti sicuri", "text": "<p>Carte, PayPal e pagamenti rapidi protetti.</p>" }
+        }
+      },
+      "block_order": ["shipping", "returns", "payments"],
+      "settings": {
+        "heading": "",
+        "columns_desktop": 3,
+        "card_style": "plain",
+        "align": "left",
+        "color_scheme": "scheme-1",
+        "section_style": "full",
+        "padding_top": 40,
+        "padding_bottom": 24
+      }
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "I più amati",
+        "collection": "",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "slider_mobile": true,
+        "link_label": "Vedi tutti",
+        "color_scheme": "scheme-1",
+        "section_style": "full",
+        "padding_top": 48,
+        "padding_bottom": 64
+      }
+    },
+    "image_with_text": {
+      "type": "image-with-text",
+      "blocks": {
+        "kicker": { "type": "kicker", "settings": { "text": "La nostra storia" } },
+        "heading": { "type": "heading", "settings": { "heading": "Fatto bene, fatto per durare" } },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Racconta cosa rende speciali i tuoi prodotti: materiali, provenienza, cura nei dettagli.</p>"
+          }
+        },
+        "checklist": {
+          "type": "checklist",
+          "settings": { "items": "Materiali selezionati\nSpedizione in 24/48 ore\nReso gratuito entro 30 giorni" }
+        },
+        "button": { "type": "button", "settings": { "label": "Scopri di più", "link": "", "style": "primary" } }
+      },
+      "block_order": ["kicker", "heading", "text", "checklist", "button"],
+      "settings": {
+        "image_ratio": "portrait",
+        "media_position": "left",
+        "color_scheme": "scheme-3",
+        "section_style": "boxed",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "collection_list": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_1": { "type": "collection", "settings": { "collection": "" } },
+        "collection_2": { "type": "collection", "settings": { "collection": "" } },
+        "collection_3": { "type": "collection", "settings": { "collection": "" } },
+        "collection_4": { "type": "collection", "settings": { "collection": "" } }
+      },
+      "block_order": ["collection_1", "collection_2", "collection_3", "collection_4"],
+      "settings": {
+        "heading": "Esplora le collezioni",
+        "columns_desktop": 4,
+        "image_ratio": "square",
+        "slider_mobile": true,
+        "color_scheme": "scheme-1",
+        "section_style": "full",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "review_1": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Prodotto arrivato in due giorni, curato in ogni dettaglio. Tornerò sicuramente.</p>",
+            "author": "Giulia R.",
+            "detail": "Cliente verificata"
+          }
+        },
+        "review_2": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Ottimo rapporto qualità prezzo e un'assistenza davvero gentile.</p>",
+            "author": "Marco B.",
+            "detail": "Cliente verificato"
+          }
+        },
+        "review_3": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "<p>Il regalo perfetto: confezione bellissima e consegna puntuale.</p>",
+            "author": "Sara L.",
+            "detail": "Cliente verificata"
+          }
+        }
+      },
+      "block_order": ["review_1", "review_2", "review_3"],
+      "settings": {
+        "heading": "Dicono di noi",
+        "columns_desktop": 3,
+        "color_scheme": "scheme-4",
+        "section_style": "boxed",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "Quanto costa la spedizione?",
+            "answer": "<p>La spedizione è gratuita per ordini superiori a 60 €. Sotto questa soglia il costo viene calcolato al checkout.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "Posso restituire un prodotto?",
+            "answer": "<p>Sì, hai 30 giorni dalla consegna per richiedere il reso.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Quali metodi di pagamento accettate?",
+            "answer": "<p>Carte di credito e debito, PayPal e gli altri metodi mostrati al checkout.</p>"
+          }
+        }
+      },
+      "block_order": ["q1", "q2", "q3"],
+      "settings": {
+        "heading": "Domande frequenti",
+        "text": "<p>Non trovi la risposta? Scrivici.</p>",
+        "link_label": "Contattaci",
+        "link_url": "",
+        "layout": "split",
+        "open_first": true,
+        "color_scheme": "scheme-1",
+        "section_style": "full",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Restiamo in contatto",
+        "text": "<p>Iscriviti per ricevere novità, consigli e offerte riservate.</p>",
+        "button_label": "Iscriviti",
+        "layout": "inline",
+        "color_scheme": "scheme-5",
+        "section_style": "boxed",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    }
+  },
+  "order": ["hero", "ticker", "features", "featured_collection", "image_with_text", "collection_list", "testimonials", "faq", "newsletter"]
+}

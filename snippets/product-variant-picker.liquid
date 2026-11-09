@@ -1,0 +1,75 @@
+{%- comment -%}
+  Selettore varianti (pagina prodotto e anteprima rapida). JS in assets/product.js (<variant-picker>).
+  Parametri: product, variant, combination_exists, section_id, style ('buttons' | 'dropdown'), swatches (bool),
+  attributes (block.shopify_attributes)
+{%- endcomment -%}
+{%- unless product.has_only_default_variant -%}
+  <variant-picker class="product__variants" data-product-part="variant-picker" {{ attributes }}>
+    {%- for option in product.options_with_values -%}
+      {%- assign option_id = 'Option-' | append: section_id | append: '-' | append: forloop.index -%}
+      {%- if style == 'dropdown' -%}
+        <div class="field">
+          <label class="field__label" for="{{ option_id }}">{{ option.name | escape }}</label>
+          <div class="select-wrap">
+            <select class="select" id="{{ option_id }}" name="options[{{ option.name | escape }}]">
+              {%- for value in option.values -%}
+                <option
+                  value="{{ value | escape }}"
+                  data-option-value-id="{{ value.id }}"
+                  data-product-url="{{ value.product_url }}"
+                  {% if value.selected %}selected{% endif %}
+                >
+                  {{- value | escape -}}
+                  {%- unless value.available %} — {{ 'products.product.unavailable' | t }}{% endunless -%}
+                </option>
+              {%- endfor -%}
+            </select>
+            {%- render 'icon', name: 'chevron-down', class: 'icon--small' -%}
+          </div>
+        </div>
+      {%- else -%}
+        <fieldset class="option">
+          <legend class="option__legend">
+            {{- option.name | escape -}}: <span class="option__selected">{{ option.selected_value | escape }}</span>
+          </legend>
+          <div class="option__values">
+            {%- for value in option.values -%}
+              {%- liquid
+                assign swatch_style = ''
+                if swatches and value.swatch
+                  if value.swatch.image
+                    assign swatch_url = value.swatch.image | image_url: width: 96
+                    assign swatch_style = '--swatch: url(' | append: swatch_url | append: ') center / cover;'
+                  elsif value.swatch.color
+                    assign swatch_style = '--swatch: ' | append: value.swatch.color | append: ';'
+                  endif
+                endif
+              -%}
+              <label
+                class="chip{% if swatch_style != blank %} chip--swatch{% endif %}{% unless value.available %} chip--unavailable{% endunless %}"
+                {% if swatch_style != blank %}style="{{ swatch_style }}" title="{{ value | escape }}"{% endif %}
+              >
+                <input
+                  type="radio"
+                  id="{{ option_id }}-{{ forloop.index }}"
+                  name="{{ option_id }}"
+                  value="{{ value | escape }}"
+                  data-option-value-id="{{ value.id }}"
+                  data-product-url="{{ value.product_url }}"
+                  {% if value.selected %}checked{% endif %}
+                >
+                <span class="chip__label{% if swatch_style != blank %} visually-hidden{% endif %}">
+                  {{- value | escape -}}
+                  {%- unless value.available -%}<span class="visually-hidden">, {{ 'products.product.unavailable' | t }}</span>{%- endunless -%}
+                </span>
+              </label>
+            {%- endfor -%}
+          </div>
+        </fieldset>
+      {%- endif -%}
+    {%- endfor -%}
+    <script type="application/json" data-selected-variant>
+      {%- if combination_exists -%}{{ variant | json }}{%- else -%}null{%- endif -%}
+    </script>
+  </variant-picker>
+{%- endunless -%}
