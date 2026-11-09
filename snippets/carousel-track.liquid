@@ -1,0 +1,48 @@
+{%- comment -%}
+  Riga a scorrimento con frecce: <carousel-slider> (frontend/entrypoints/carousel.js + carousel.css, che la
+  section carica con vite-tag). Usata dalla section Carosello e dalle section con layout "Carosello".
+  Senza JS resta una riga che scorre a mano; le frecce compaiono solo se la riga scorre.
+
+  Parametri:
+  - id: identificatore univoco (es. section.id)
+  - items: gli elementi <li class="carousel__slide"> già pronti
+  - heading: intestazione già pronta (es. snippet section-heading), facoltativa
+  - align: allineamento dell'intestazione, 'left' (default) | 'center'
+  - label: nome accessibile della riga (se vuoto: "Carosello")
+  - per_view: elementi visibili su desktop
+  - per_view_mobile: elementi visibili su mobile (es. 1.15 = uno con anteprima del successivo, 2.2)
+  - show_arrows: false per nascondere le frecce (default: visibili)
+  - list_attributes: attributi aggiuntivi della lista (es. 'data-recommendations-list')
+{%- endcomment -%}
+{%- liquid
+  assign track_id = 'Carousel-' | append: id
+  assign track_label = label
+  if track_label == blank
+    assign track_label = 'sections.carousel.label' | t
+  endif
+  assign arrows = true
+  if show_arrows == false
+    assign arrows = false
+  endif
+-%}
+<carousel-slider class="carousel" style="--per-view: {{ per_view }}; --per-view-mobile: {{ per_view_mobile }};">
+  {%- if heading != blank or arrows -%}
+    <div class="carousel__head{% if align == 'center' %} carousel__head--center{% endif %}">
+      {{- heading -}}
+      {%- if arrows -%}
+        <div class="carousel__arrows">
+          <button type="button" class="icon-button carousel__arrow" data-carousel-prev aria-label="{{ 'sections.carousel.previous' | t }}" aria-controls="{{ track_id }}">
+            {%- render 'icon', name: 'arrow-left' -%}
+          </button>
+          <button type="button" class="icon-button carousel__arrow" data-carousel-next aria-label="{{ 'sections.carousel.next' | t }}" aria-controls="{{ track_id }}">
+            {%- render 'icon', name: 'arrow-right' -%}
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <ul class="carousel__track" id="{{ track_id }}" role="list" data-carousel-track tabindex="0" aria-label="{{ track_label | escape }}"{% if list_attributes != blank %} {{ list_attributes }}{% endif %}>
+    {{- items -}}
+  </ul>
+</carousel-slider>

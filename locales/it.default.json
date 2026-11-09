@@ -53,6 +53,15 @@
       "previous": "Precedenti",
       "next": "Successivi"
     },
+    "slideshow": {
+      "label": "Presentazione",
+      "slide": "Slide {{ index }} di {{ count }}",
+      "go_to": "Vai alla slide {{ index }}",
+      "previous": "Slide precedente",
+      "next": "Slide successiva",
+      "pause": "Metti in pausa la presentazione",
+      "play": "Avvia la presentazione"
+    },
     "collection_tabs": {
       "view_all": "Vedi tutto in {{ title }}"
     },

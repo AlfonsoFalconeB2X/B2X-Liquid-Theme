@@ -53,6 +53,15 @@
       "previous": "Previous",
       "next": "Next"
     },
+    "slideshow": {
+      "label": "Slideshow",
+      "slide": "Slide {{ index }} of {{ count }}",
+      "go_to": "Go to slide {{ index }}",
+      "previous": "Previous slide",
+      "next": "Next slide",
+      "pause": "Pause slideshow",
+      "play": "Play slideshow"
+    },
     "collection_tabs": {
       "view_all": "View all {{ title }}"
     },

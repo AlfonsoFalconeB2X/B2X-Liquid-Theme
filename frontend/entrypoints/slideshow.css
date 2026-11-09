@@ -1,0 +1,150 @@
+/*
+ * Section Slideshow (caricato da sections/slideshow.liquid).
+ * Le immagini occupano tutta la section (o tutto il riquadro): gli spazi sopra e sotto diventano margini interni
+ * delle slide, come nella hero con il testo sopra l'immagine. Il testo usa le classi della hero (.hero__content).
+ * Senza JS le slide scorrono a mano (scroll-snap) e i controlli restano nascosti.
+ */
+
+.section--slideshow:not(.section--boxed) {
+  padding-block: 0;
+}
+
+.section--slideshow:not(.section--boxed) > .section__inner {
+  max-width: none;
+  padding-inline: 0;
+}
+
+.section--slideshow.section--boxed > .section__inner {
+  padding: 0;
+}
+
+.slideshow {
+  position: relative;
+  display: block;
+  --controls-space: 0px;
+}
+
+.slideshow[data-ready] {
+  --controls-space: 3.5rem;
+}
+
+.slideshow__track {
+  display: grid;
+  grid-auto-columns: 100%;
+  grid-auto-flow: column;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.slideshow__track::-webkit-scrollbar {
+  display: none;
+}
+
+.slideshow__track:focus-visible {
+  outline-offset: -4px;
+}
+
+.slideshow__slide {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: var(--slide-align, end);
+  min-height: var(--slide-height, auto);
+  padding-block: calc(var(--pt, 64px) * var(--space-scale))
+    calc(var(--pb, 64px) * var(--space-scale) + var(--controls-space));
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.slideshow__media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.slideshow__media picture,
+.slideshow__media img,
+.slideshow__media svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slideshow__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: var(--overlay, 0.3);
+}
+
+/* Controlli: frecce, punti e pausa, sopra le immagini in basso */
+.slideshow__controls {
+  position: absolute;
+  inset: auto 0 0.5rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.slideshow[data-ready] .slideshow__controls {
+  display: flex;
+}
+
+.slideshow__controls .icon-button:hover {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.slideshow__dots {
+  display: flex;
+}
+
+.slideshow__dot {
+  position: relative;
+  width: 1.5rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.slideshow__dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.5;
+  translate: -50% -50%;
+  transition:
+    width var(--duration) var(--ease),
+    opacity var(--duration) var(--ease);
+}
+
+.slideshow__dot:hover::before {
+  opacity: 0.8;
+}
+
+.slideshow__dot[aria-current='true']::before {
+  width: 1.25rem;
+  opacity: 1;
+}
+
+.slideshow__icon-play,
+.slideshow[data-paused] .slideshow__icon-pause {
+  display: none;
+}
+
+.slideshow[data-paused] .slideshow__icon-play {
+  display: block;
+}

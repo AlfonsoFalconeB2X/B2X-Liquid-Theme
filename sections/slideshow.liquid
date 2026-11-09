@@ -1,0 +1,335 @@
+{% render 'vite-tag', entry: 'slideshow.css' %}
+{% render 'vite-tag', entry: 'slideshow.js' %}
+{%- liquid
+  assign s = section.settings
+  assign slide_count = section.blocks.size
+
+  case s.height
+    when 'small'
+      assign slide_height = 'max(22rem, 50svh)'
+    when 'large'
+      assign slide_height = 'max(32rem, 82svh)'
+    when 'full'
+      assign slide_height = 'calc(100svh - var(--header-offset))'
+    else
+      assign slide_height = 'max(26rem, 66svh)'
+  endcase
+
+  case s.vertical_align
+    when 'top'
+      assign slide_align = 'start'
+    when 'center'
+      assign slide_align = 'center'
+    else
+      assign slide_align = 'end'
+  endcase
+
+  assign overlay = s.overlay_opacity | divided_by: 100.0
+  assign style_vars = '--slide-height: ' | append: slide_height | append: '; --slide-align: ' | append: slide_align | append: '; --overlay: ' | append: overlay | append: ';'
+
+  assign heading_class = 'h1'
+  if s.heading_size == 'xl'
+    assign heading_class = 'h0'
+  endif
+
+  assign autoplay = false
+  if s.autoplay and slide_count > 1
+    assign autoplay = true
+  endif
+  assign interval = s.autoplay_speed | times: 1000
+  assign label = 'sections.slideshow.label' | t
+-%}
+
+<div {% render 'section-attributes', section: section, class: 'section--slideshow', style_vars: style_vars %}>
+  <div class="section__inner page-width">
+    <slide-show
+      class="slideshow"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="{{ label }}"
+      {% if autoplay %}
+        data-autoplay data-interval="{{ interval }}"
+      {% endif %}
+    >
+      <div class="slideshow__track" id="Slideshow-{{ section.id }}" data-slideshow-track tabindex="0" aria-live="polite">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign b = block.settings
+            assign loading = 'lazy'
+            assign priority = 'auto'
+            if forloop.first and section.index == 1
+              assign loading = 'eager'
+              assign priority = 'high'
+            endif
+            assign has_button = false
+            assign has_button_2 = false
+            if b.button_label != blank and b.button_link != blank
+              assign has_button = true
+            endif
+            if b.button_label_2 != blank and b.button_link_2 != blank
+              assign has_button_2 = true
+            endif
+          -%}
+          <div
+            class="slideshow__slide"
+            id="Slide-{{ section.id }}-{{ forloop.index }}"
+            role="group"
+            aria-roledescription="slide"
+            aria-label="{{ 'sections.slideshow.slide' | t: index: forloop.index, count: slide_count }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="slideshow__media">
+              {%- if b.image != blank -%}
+                <picture>
+                  {%- if b.image_mobile != blank -%}
+                    <source
+                      media="(max-width: 749px)"
+                      srcset="{{ b.image_mobile | image_url: width: 750 }} 750w, {{ b.image_mobile | image_url: width: 1100 }} 1100w, {{ b.image_mobile | image_url: width: 1500 }} 1500w"
+                      sizes="100vw"
+                    >
+                  {%- endif -%}
+                  {{
+                    b.image
+                    | image_url: width: 3000
+                    | image_tag:
+                      widths: '750, 1100, 1500, 1800, 2200, 2600, 3000',
+                      sizes: '100vw',
+                      loading: loading,
+                      fetchpriority: priority
+                  }}
+                </picture>
+              {%- else -%}
+                {%- assign placeholder_index = forloop.index0 | modulo: 2 | plus: 1 -%}
+                {{ 'lifestyle-' | append: placeholder_index | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            </div>
+
+            <div class="slideshow__inner page-width">
+              <div class="hero__content{% if s.content_align == 'center' %} hero__content--center{% endif %} on-media">
+                {%- if b.kicker != blank -%}
+                  <p class="kicker">{{ b.kicker | escape }}</p>
+                {%- endif -%}
+                {%- if b.heading != blank -%}
+                  <h2 class="{{ heading_class }}">{{ b.heading | escape }}</h2>
+                {%- endif -%}
+                {%- if b.text != blank -%}
+                  <div class="rte text-lead hero__text">{{ b.text }}</div>
+                {%- endif -%}
+                {%- if has_button or has_button_2 -%}
+                  <div class="button-group">
+                    {%- if has_button -%}
+                      <a class="button button--large" href="{{ b.button_link }}">{{ b.button_label | escape }}</a>
+                    {%- endif -%}
+                    {%- if has_button_2 -%}
+                      <a class="button button--large button--secondary" href="{{ b.button_link_2 }}">{{ b.button_label_2 | escape }}</a>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if slide_count > 1 -%}
+        <div class="slideshow__controls on-media">
+          <button type="button" class="icon-button" data-slideshow-prev aria-label="{{ 'sections.slideshow.previous' | t }}" aria-controls="Slideshow-{{ section.id }}">
+            {%- render 'icon', name: 'arrow-left' -%}
+          </button>
+          <div class="slideshow__dots">
+            {%- for block in section.blocks -%}
+              <button
+                type="button"
+                class="slideshow__dot"
+                data-slideshow-dot
+                aria-label="{{ 'sections.slideshow.go_to' | t: index: forloop.index }}"
+                aria-controls="Slide-{{ section.id }}-{{ forloop.index }}"
+                {% if forloop.first %}
+                  aria-current="true"
+                {% endif %}
+              ></button>
+            {%- endfor -%}
+          </div>
+          <button type="button" class="icon-button" data-slideshow-next aria-label="{{ 'sections.slideshow.next' | t }}" aria-controls="Slideshow-{{ section.id }}">
+            {%- render 'icon', name: 'arrow-right' -%}
+          </button>
+          {%- if autoplay -%}
+            <button
+              type="button"
+              class="icon-button slideshow__toggle"
+              data-slideshow-toggle
+              aria-label="{{ 'sections.slideshow.pause' | t }}"
+              data-label-pause="{{ 'sections.slideshow.pause' | t }}"
+              data-label-play="{{ 'sections.slideshow.play' | t }}"
+            >
+              {%- render 'icon', name: 'pause', class: 'slideshow__icon-pause' -%}
+              {%- render 'icon', name: 'play', class: 'icon--small icon--fill slideshow__icon-play' -%}
+            </button>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </slide-show>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Slideshow",
+  "class": "section-slideshow",
+  "max_blocks": 6,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Scorrimento automatico",
+      "info": "Compare un pulsante di pausa. Si sospende al passaggio del mouse e si ferma quando il cliente usa la tastiera; non parte se il cliente ha attivato le animazioni ridotte, né nel theme editor.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Cambia slide ogni",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 6,
+      "visible_if": "{{ section.settings.autoplay }}"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Altezza",
+      "options": [
+        { "value": "small", "label": "Bassa" },
+        { "value": "medium", "label": "Media" },
+        { "value": "large", "label": "Alta" },
+        { "value": "full", "label": "Tutto lo schermo" }
+      ],
+      "default": "medium"
+    },
+    { "type": "header", "content": "Testo" },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Dimensione titolo",
+      "options": [
+        { "value": "large", "label": "Grande" },
+        { "value": "xl", "label": "Molto grande" }
+      ],
+      "default": "large"
+    },
+    {
+      "type": "select",
+      "id": "content_align",
+      "label": "Allineamento del testo",
+      "options": [
+        { "value": "left", "label": "Sinistra" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "vertical_align",
+      "label": "Posizione verticale del testo",
+      "options": [
+        { "value": "top", "label": "In alto" },
+        { "value": "center", "label": "Al centro" },
+        { "value": "bottom", "label": "In basso" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Velo scuro sulle immagini",
+      "info": "Garantisce la leggibilità del testo bianco.",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    { "type": "header", "content": "Aspetto" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-2" },
+    {
+      "type": "select",
+      "id": "section_style",
+      "label": "Stile",
+      "options": [
+        { "value": "full", "label": "A tutta larghezza" },
+        { "value": "boxed", "label": "Riquadro" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Spazio sopra il testo",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Spazio sotto il testo",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Immagine" },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Immagine per mobile",
+          "info": "Facoltativa: sostituisce l'immagine sotto i 750px."
+        },
+        { "type": "text", "id": "kicker", "label": "Etichetta" },
+        { "type": "text", "id": "heading", "label": "Titolo", "default": "Titolo della slide" },
+        { "type": "richtext", "id": "text", "label": "Testo" },
+        { "type": "text", "id": "button_label", "label": "Etichetta pulsante principale", "default": "Scopri di più" },
+        { "type": "url", "id": "button_link", "label": "Link pulsante principale", "default": "/collections/all" },
+        { "type": "text", "id": "button_label_2", "label": "Etichetta pulsante secondario" },
+        { "type": "url", "id": "button_link_2", "label": "Link pulsante secondario" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slideshow",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "kicker": "Nuova collezione",
+            "heading": "Pezzi essenziali, scelti con cura",
+            "text": "<p>Materiali buoni, forme semplici e spedizione veloce in tutta Italia.</p>",
+            "button_label": "Scopri i prodotti"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "kicker": "Solo online",
+            "heading": "Spedizione gratuita sopra i 50 €",
+            "button_label": "Vai al catalogo"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

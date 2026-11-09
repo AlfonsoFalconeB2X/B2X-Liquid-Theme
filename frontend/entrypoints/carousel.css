@@ -1,4 +1,7 @@
-/* Section Carosello (caricato da sections/carousel.liquid) */
+/*
+ * Carosello: <carousel-slider> dello snippet carousel-track. Caricato dalla section Carosello e dalle section
+ * con layout "Carosello" (collezione in evidenza, prodotti consigliati, recensioni, elenco collezioni).
+ */
 
 .carousel__head {
   display: flex;
@@ -10,12 +13,23 @@
 }
 
 .carousel__head .section-heading {
+  flex: 1 1 auto;
   margin-bottom: 0;
+}
+
+.carousel__head--center {
+  flex-direction: column;
+  align-items: center;
 }
 
 .carousel__arrows {
   display: none;
   gap: 0.5rem;
+  margin-inline-start: auto;
+}
+
+.carousel__head--center .carousel__arrows {
+  margin-inline: auto;
 }
 
 carousel-slider[data-scrollable] .carousel__arrows {

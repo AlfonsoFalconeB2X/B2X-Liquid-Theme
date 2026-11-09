@@ -17,38 +17,71 @@
   if link_url == blank and collection != blank
     assign link_url = collection.url
   endif
+
+  assign carousel = false
+  if s.layout == 'carousel'
+    assign carousel = true
+    assign per_view_mobile = '1.15'
+    if s.columns_mobile == '2'
+      assign per_view_mobile = '2.2'
+    endif
+  endif
 -%}
+
+{%- if carousel -%}
+  {% render 'vite-tag', entry: 'carousel.css' %}
+  {% render 'vite-tag', entry: 'carousel.js' %}
+{%- endif -%}
+
+{%- capture heading -%}
+  {%- render 'section-heading',
+    kicker: s.kicker,
+    heading: s.heading,
+    text: s.text,
+    link_label: s.link_label,
+    link_url: link_url,
+    align: s.heading_align
+  -%}
+{%- endcapture -%}
+
+{%- capture items -%}
+  {%- if collection != blank and collection.products_count > 0 -%}
+    {%- for product in collection.products limit: s.products_to_show -%}
+      <li class="reveal{% if carousel %} carousel__slide{% endif %}">
+        {% render 'product-card', product: product, section_id: section.id, sizes: sizes %}
+      </li>
+    {%- endfor -%}
+  {%- else -%}
+    {%- for i in (1..s.products_to_show) -%}
+      <li class="reveal{% if carousel %} carousel__slide{% endif %}">
+        {% render 'product-card', product: blank, placeholder_index: forloop.index0, section_id: section.id %}
+      </li>
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
 
 <div {% render 'section-attributes', section: section %}>
   <div class="section__inner page-width">
-    {%- render 'section-heading',
-      kicker: s.kicker,
-      heading: s.heading,
-      text: s.text,
-      link_label: s.link_label,
-      link_url: link_url,
-      align: s.heading_align
-    -%}
-
-    <ul
-      class="grid{% if s.slider_mobile %} grid--slider{% endif %}"
-      role="list"
-      style="--cols-mobile: {{ s.columns_mobile }}; --cols-tablet: {{ columns_tablet }}; --cols-desktop: {{ columns }}; --slide-width: {{ slide_width }};"
-    >
-      {%- if collection != blank and collection.products_count > 0 -%}
-        {%- for product in collection.products limit: s.products_to_show -%}
-          <li class="reveal">
-            {% render 'product-card', product: product, section_id: section.id, sizes: sizes %}
-          </li>
-        {%- endfor -%}
-      {%- else -%}
-        {%- for i in (1..s.products_to_show) -%}
-          <li class="reveal">
-            {% render 'product-card', product: blank, placeholder_index: forloop.index0, section_id: section.id %}
-          </li>
-        {%- endfor -%}
-      {%- endif -%}
-    </ul>
+    {%- if carousel -%}
+      {%- render 'carousel-track',
+        id: section.id,
+        items: items,
+        heading: heading,
+        align: s.heading_align,
+        label: s.heading,
+        per_view: columns,
+        per_view_mobile: per_view_mobile
+      -%}
+    {%- else -%}
+      {{- heading -}}
+      <ul
+        class="grid{% if s.slider_mobile %} grid--slider{% endif %}"
+        role="list"
+        style="--cols-mobile: {{ s.columns_mobile }}; --cols-tablet: {{ columns_tablet }}; --cols-desktop: {{ columns }}; --slide-width: {{ slide_width }};"
+      >
+        {{- items -}}
+      </ul>
+    {%- endif -%}
   </div>
 </div>
 
@@ -80,8 +113,27 @@
       "label": "Link",
       "info": "Se vuoto porta alla collezione scelta."
     },
-    { "type": "header", "content": "Griglia" },
-    { "type": "range", "id": "columns_desktop", "label": "Colonne su desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "header", "content": "Disposizione" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Mostra come",
+      "options": [
+        { "value": "grid", "label": "Griglia" },
+        { "value": "carousel", "label": "Carosello" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Colonne su desktop",
+      "info": "Con il carosello: prodotti visibili insieme.",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
     {
       "type": "select",
       "id": "columns_mobile",
@@ -96,7 +148,8 @@
       "type": "checkbox",
       "id": "slider_mobile",
       "label": "Scorrimento orizzontale su mobile",
-      "default": true
+      "default": true,
+      "visible_if": "{{ section.settings.layout == 'grid' }}"
     },
     { "type": "header", "content": "Aspetto" },
     { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },

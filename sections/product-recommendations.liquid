@@ -4,7 +4,18 @@
   assign columns_tablet = columns | at_most: 3
   assign column_width = settings.page_width | divided_by: columns
   assign sizes = '(min-width: 990px) ' | append: column_width | append: 'px, (min-width: 750px) 33vw, 50vw'
+
+  assign carousel = false
+  if s.layout == 'carousel'
+    assign carousel = true
+  endif
 -%}
+
+{%- comment -%} Fuori da <product-recommendations>: il contenuto arriva dopo, con la Section Rendering API {%- endcomment -%}
+{%- if carousel -%}
+  {% render 'vite-tag', entry: 'carousel.css' %}
+  {% render 'vite-tag', entry: 'carousel.js' %}
+{%- endif -%}
 
 <div {% render 'section-attributes', section: section %}>
   <div class="section__inner page-width">
@@ -12,17 +23,39 @@
       data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ s.products_to_show }}&intent={{ s.intent }}"
     >
       {%- if recommendations.performed? and recommendations.products_count > 0 -%}
-        {%- render 'section-heading', kicker: s.kicker, heading: s.heading, align: s.heading_align -%}
-        <ul
-          class="grid grid--slider"
-          role="list"
-          data-recommendations-list
-          style="--cols-mobile: 2; --cols-tablet: {{ columns_tablet }}; --cols-desktop: {{ columns }}; --slide-width: 44%;"
-        >
+        {%- capture heading -%}
+          {%- render 'section-heading', kicker: s.kicker, heading: s.heading, align: s.heading_align -%}
+        {%- endcapture -%}
+        {%- capture items -%}
           {%- for recommendation in recommendations.products -%}
-            <li>{% render 'product-card', product: recommendation, section_id: section.id, sizes: sizes %}</li>
+            <li{% if carousel %} class="carousel__slide"{% endif %}>
+              {%- render 'product-card', product: recommendation, section_id: section.id, sizes: sizes -%}
+            </li>
           {%- endfor -%}
-        </ul>
+        {%- endcapture -%}
+
+        {%- if carousel -%}
+          {%- render 'carousel-track',
+            id: section.id,
+            items: items,
+            heading: heading,
+            align: s.heading_align,
+            label: s.heading,
+            per_view: columns,
+            per_view_mobile: '2.2',
+            list_attributes: 'data-recommendations-list'
+          -%}
+        {%- else -%}
+          {{- heading -}}
+          <ul
+            class="grid grid--slider"
+            role="list"
+            data-recommendations-list
+            style="--cols-mobile: 2; --cols-tablet: {{ columns_tablet }}; --cols-desktop: {{ columns }}; --slide-width: 44%;"
+          >
+            {{- items -}}
+          </ul>
+        {%- endif -%}
       {%- endif -%}
     </product-recommendations>
   </div>
@@ -58,7 +91,27 @@
       "info": "I complementari si impostano con l'app Search & Discovery."
     },
     { "type": "range", "id": "products_to_show", "label": "Prodotti da mostrare", "min": 2, "max": 10, "step": 1, "default": 4 },
-    { "type": "range", "id": "columns_desktop", "label": "Colonne su desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "header", "content": "Disposizione" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Mostra come",
+      "options": [
+        { "value": "grid", "label": "Griglia" },
+        { "value": "carousel", "label": "Carosello" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Colonne su desktop",
+      "info": "Con il carosello: prodotti visibili insieme.",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
     { "type": "header", "content": "Aspetto" },
     { "type": "color_scheme", "id": "color_scheme", "label": "Schema colori", "default": "scheme-1" },
     {
